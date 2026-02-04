@@ -493,6 +493,192 @@ body.light-mode .theme-switch {
     color: #000000;
 }
 
+/* --- COOKIE BANNER ŠTÝLY --- */
+.cookie-overlay {
+    position: fixed;
+    bottom: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 90%;
+    max-width: 600px;
+    background: rgba(15, 15, 15, 0.95);
+    border: 1px solid var(--primary);
+    border-radius: 20px;
+    padding: 25px;
+    display: none; /* Skryté, kým JS nepovie inak */
+    flex-direction: column;
+    gap: 15px;
+    z-index: 10000;
+    box-shadow: 0 10px 50px rgba(0,0,0,0.8);
+    backdrop-filter: blur(10px);
+    animation: slideUp 0.5s ease-out;
+}
+
+@keyframes slideUp {
+    from { transform: translate(-50%, 100px); opacity: 0; }
+    to { transform: translate(-50%, 0); opacity: 1; }
+}
+
+.cookie-content h3 {
+    color: var(--primary);
+    font-weight: 900;
+    margin-bottom: 5px;
+    text-transform: uppercase;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.cookie-content p {
+    font-size: 0.85rem;
+    color: var(--text-dim);
+    line-height: 1.5;
+}
+
+.cookie-actions {
+    display: flex;
+    gap: 10px;
+    margin-top: 10px;
+}
+
+.btn-cookie-accept {
+    flex: 1;
+    background: var(--primary);
+    color: white;
+    border: none;
+    padding: 12px;
+    border-radius: 10px;
+    font-weight: 900;
+    cursor: pointer;
+    text-transform: uppercase;
+    transition: 0.3s;
+}
+
+.btn-cookie-accept:hover {
+    background: #ff6600;
+    box-shadow: 0 0 15px var(--primary-glow);
+}
+
+.btn-cookie-decline {
+    flex: 1;
+    background: transparent;
+    color: var(--text-dim);
+    border: 1px solid #333;
+    padding: 12px;
+    border-radius: 10px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: 0.3s;
+}
+
+.btn-cookie-decline:hover {
+    border-color: #fff;
+    color: #fff;
+}
+/* MODERNÝ WORKOUT ENGINE PRO */
+.side-panel {
+    position: fixed;
+    top: 0;
+    right: -520px; 
+    width: 520px;
+    height: 100%;
+    background: rgba(8, 8, 8, 0.95);
+    backdrop-filter: blur(25px);
+    border-left: 1px solid rgba(255, 77, 0, 0.2);
+    z-index: 9999;
+    transition: 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+    display: flex;
+    flex-direction: column;
+    box-shadow: -15px 0 50px rgba(0,0,0,0.8);
+}
+
+.side-panel.active { right: 0; }
+
+.side-header {
+    padding: 30px;
+    border-bottom: 1px solid rgba(255,255,255,0.05);
+}
+
+.workout-stats-mini {
+    display: flex;
+    gap: 20px;
+    margin-top: 15px;
+}
+
+.stat-v {
+    font-size: 0.7rem;
+    color: var(--text-dim);
+}
+
+.stat-v span {
+    display: block;
+    color: var(--primary);
+    font-weight: 900;
+    font-size: 1rem;
+}
+
+/* Karty cvikov */
+.exercise-card {
+    background: #121212;
+    border: 1px solid #222;
+    border-radius: 18px;
+    padding: 20px;
+    margin: 0 25px 20px 25px;
+    transition: 0.3s;
+}
+
+.exercise-card:hover { border-color: var(--primary-glow); }
+
+.set-row {
+    display: grid;
+    grid-template-columns: 30px 1fr 60px 60px 60px 30px;
+    gap: 10px;
+    align-items: center;
+    margin-top: 10px;
+    padding: 5px 0;
+}
+
+.set-type {
+    font-size: 0.6rem;
+    font-weight: 900;
+    background: #222;
+    color: var(--text-dim);
+    border-radius: 4px;
+    text-align: center;
+    padding: 2px 0;
+    cursor: pointer;
+}
+
+.set-type.dropset { color: #0088ff; border: 1px solid #0088ff; }
+.set-type.warmup { color: #ffcc00; border: 1px solid #ffcc00; }
+
+.set-input {
+    background: #000;
+    border: 1px solid #333;
+    color: white;
+    padding: 8px;
+    border-radius: 6px;
+    text-align: center;
+    font-size: 0.9rem;
+    width: 100%;
+}
+
+.set-input:focus { border-color: var(--primary); outline: none; }
+
+.add-set-btn {
+    background: none;
+    border: 1px dashed #444;
+    color: #666;
+    width: 100%;
+    padding: 8px;
+    border-radius: 8px;
+    margin-top: 15px;
+    cursor: pointer;
+    font-size: 0.75rem;
+    font-weight: bold;
+}
+
+.add-set-btn:hover { border-color: var(--primary); color: var(--primary); }
     </style>
 </head>
 <body id="main-body">
@@ -638,6 +824,7 @@ body.light-mode .theme-switch {
                 <button class="cart-btn" id="cart-nav-btn" onclick="openCart()">KOŠÍK (<span id="cart-count">0</span>)</button>
                 <div class="theme-switch" onclick="toggleTheme()" title="Zmeniť režim">
     <span id="theme-icon">🌙</span>
+    
 </div>
 
                 <div class="profile-icon" id="user-profile-btn" onclick="openProfile()">
@@ -650,7 +837,7 @@ body.light-mode .theme-switch {
 
         <header class="hero">
             <video autoplay muted loop playsinline class="hero-video-bg">
-                <source src="https://player.vimeo.com/external/494252666.sd.mp4?s=724068303f8a6190ec385a49826a7605d3923a1a&profile_id=164&oauth2_token_id=57447761" type="video/mp4">
+                <source src="https://www.pexels.com/download/video/5319760/" type="video/mp4">
             </video>
 
             <div class="hero-text">
@@ -667,9 +854,39 @@ body.light-mode .theme-switch {
                     <span>+ 482 ľudí dnes začalo trénovať</span>
                 </div>
             </div>
-            <div class="hero-image">
-                <img src="https://images.unsplash.com/photo-1517836357463-d25dfeac3438?auto=format&fit=crop&w=800&q=80" alt="Athlete">
-            </div>
+            <div id="side-tracker" class="side-panel">
+    <div class="side-handle" onclick="toggleTracker()">
+        <span>ENGINE PRO ⚡</span>
+    </div>
+
+    <div class="side-header">
+        <h2 style="margin:0;">WORKOUT <span style="color:var(--primary);">LOG</span></h2>
+        <div class="stats-row">
+            <div class="mini-stat">Objem <span id="total-vol">0 kg</span></div>
+            <div class="mini-stat">Série <span id="total-s">0</span></div>
+            <div class="mini-stat">Čas <span id="timer">0:00</span></div>
+        </div>
+    </div>
+
+    <div class="part-tabs">
+        <button class="tab-btn" onclick="showExercises('Prsia')">PRSIA</button>
+        <button class="tab-btn" onclick="showExercises('Chrbát')">CHRBÁT</button>
+        <button class="tab-btn" onclick="showExercises('Nohy')">NOHY</button>
+        <button class="tab-btn" onclick="showExercises('Ramená')">RAMENÁ</button>
+        <button class="tab-btn" onclick="showExercises('Ruky')">RUKY</button>
+    </div>
+
+    <div id="exercise-picker" style="padding: 0 30px 10px 30px; display:none; flex-wrap: wrap; gap: 5px;"></div>
+
+    <div id="workout-content" style="flex-grow:1; overflow-y:auto; padding-top: 10px;">
+        <p id="empty-msg" style="text-align:center; color:#444; margin-top:50px;">Zatiaľ žiadne cviky. Vyber partiu hore!</p>
+    </div>
+
+    <div style="padding:25px; border-top: 1px solid rgba(255,255,255,0.05);">
+        <button onclick="finishWorkout()" class="btn" style="width:100%; border-radius:12px;">DOKONČIŤ TRÉNING</button>
+    </div>
+</div>
+</div>
         </header>
 
         <div class="trust-bar">
@@ -837,23 +1054,100 @@ body.light-mode .theme-switch {
         transform: translateY(-10px);
         box-shadow: 0 20px 40px rgba(255, 77, 0, 0.1);
     }
+/* --- BEFORE & AFTER SLIDER --- */
+.transformation-section {
+    padding: 60px 10%;
+    text-align: center;
+    background: #080808;
+}
 
+.ba-container {
+    position: relative;
+    width: 100%;
+    max-width: 600px;
+    height: 400px;
+    margin: 0 auto;
+    border: 2px solid var(--primary);
+    border-radius: 20px;
+    overflow: hidden;
+    box-shadow: 0 0 30px rgba(255, 77, 0, 0.2);
+}
+
+.ba-img-container {
+    position: absolute;
+    top: 0; left: 0; width: 100%; height: 100%;
+    overflow: hidden;
+}
+
+.ba-img-container img {
+    width: 100%; height: 100%;
+    object-fit: cover;
+    object-position: left; /* Dôležité pre zarovnanie */
+}
+
+/* Modifikovaný (vrchný) obrázok sa bude orezávať */
+.ba-img-container.modified {
+    width: 50%; /* Začína na 50% */
+    border-right: 2px solid white;
+    z-index: 2;
+}
+
+/* Štýl pre posuvník (input range) - robíme ho neviditeľným, ale funkčným cez celú šírku */
+.ba-slider {
+    position: absolute;
+    top: 0; left: 0; width: 100%; height: 100%;
+    z-index: 10;
+    opacity: 0;
+    cursor: e-resize;
+    margin: 0;
+}
+
+/* Vizuálna čiara a tlačidlo */
+.ba-line {
+    position: absolute;
+    top: 0; bottom: 0; left: 50%;
+    width: 2px;
+    background: #fff;
+    z-index: 5;
+    pointer-events: none; /* Aby neblokovala kliknutia */
+}
+
+.ba-button {
+    position: absolute;
+    top: 50%; left: 50%;
+    transform: translate(-50%, -50%);
+    width: 40px; height: 40px;
+    background: var(--primary);
+    color: white;
+    border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-weight: bold;
+    z-index: 6;
+    box-shadow: 0 0 10px rgba(0,0,0,0.5);
+    pointer-events: none;
+}
 </style>
-            <h2 class="section-title">ČASTÉ <span>OTÁZKY</span></h2>
-            <div class="faq-container">
-                <div class="faq-item" onclick="toggleFaq(this)">
-                    <div class="faq-question">Kedy mi bude program doručený? <span>+</span></div>
-                    <div class="faq-answer">Okamžite. Po úspešnej platbe ti príde e-mail s odkazom na stiahnutie vo formáte PDF, ktorý si môžeš otvoriť v mobile aj PC.</div>
-                </div>
-                <div class="faq-item" onclick="toggleFaq(this)">
-                    <div class="faq-question">Je program vhodný aj pre začiatočníkov? <span>+</span></div>
-                    <div class="faq-answer">Áno, každý guide obsahuje technické ukážky a vysvetlenia, ktoré zvládne aj úplný nováčik.</div>
-                </div>
-                <div class="faq-item" onclick="toggleFaq(this)">
-                    <div class="faq-question">Potrebujem k Domácemu Warriorovi činky? <span>+</span></div>
-                    <div class="faq-answer">Nie, tento program je navrhým čisto pre prácu s vlastnou váhou, prípadne s bežnými vecami, ktoré máš doma.</div>
-                </div>
-            </div>
+<section class="transformation-section">
+    <h2 class="section-title">SKUTOČNÉ <span>VÝSLEDKY</span></h2>
+    
+    <div class="ba-container">
+        <div class="ba-img-container modified">
+            <img src="https://images.unsplash.com/photo-1571019614242-c5c5dee9f50b?ixlib=rb-1.2.1&auto=format&fit=crop&w=800&q=80" alt="After">
+        </div>
+        
+        <div class="ba-img-container">
+            <img src="https://images.unsplash.com/photo-1583454110551-21f2fa2afe61?ixlib=rb-1.2.1&auto=format&fit=crop&w=800&q=80" alt="Before">
+        </div>
+        
+        <input type="range" min="0" max="100" value="50" class="ba-slider" oninput="slideCompare(this)">
+        <div class="ba-line"></div>
+        <div class="ba-button">↔</div>
+    </div>
+    
+    <p style="text-align: center; margin-top: 20px; color: var(--text-dim);">
+        Marek (24 r.) - Výsledok po 3 mesiacoch programu <b>Objemový Kráľ</b>
+    </p>
+</section>
         </section>
 
         <div class="newsletter-footer">
@@ -1031,6 +1325,7 @@ body.light-mode .theme-switch {
     </div>
 
     <div id="sales-notification"></div>
+    
 
     <script>
         
@@ -1521,68 +1816,7 @@ window.addEventListener('DOMContentLoaded', () => {
         if(icon) icon.innerText = '☀️';
     }
 });
-// SEM VLOŽ SVOJ KĽÚČ
-    const OPENAI_API_KEY = "TU_VLOZ_SVOJ_API_KLUC"; 
 
-    function toggleChat() {
-        const chat = document.getElementById('chat-window');
-        chat.style.display = chat.style.display === 'none' ? 'block' : 'none';
-    }
-
-    async function sendMessage() {
-        const input = document.getElementById('user-input');
-        const content = document.getElementById('chat-content');
-        const userText = input.value.trim();
-
-        if (userText === "") return;
-
-        // Pridanie bubliny používateľa
-        content.innerHTML += `<div style="background: var(--primary); padding: 8px 12px; border-radius: 10px; align-self: flex-end; color: white;">${userText}</div>`;
-        input.value = "";
-        content.scrollTop = content.scrollHeight;
-
-        // Indikátor písania
-        const loadingId = "loading-" + Date.now();
-        content.innerHTML += `<div id="${loadingId}" style="color: var(--text-dim); font-style: italic; font-size: 0.8rem;">AI rozmýšľa...</div>`;
-
-        try {
-            const response = await fetch('https://api.openai.com/v1/chat/completions', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'Authorization': `Bearer ${OPENAI_API_KEY}`
-                },
-                body: JSON.stringify({
-                    model: "gpt-3.5-turbo",
-                    messages: [
-                        { role: "system", content: "Si fitness asistent pre stránku FitProgress. Odpovedaj stručne, motivačne a v slovenčine." },
-                        { role: "user", content: userText }
-                    ],
-                    temperature: 0.7
-                })
-            });
-
-            const data = await response.json();
-            document.getElementById(loadingId).remove();
-
-            if (data.choices && data.choices[0]) {
-                const aiReply = data.choices[0].message.content;
-                content.innerHTML += `<div style="background: #222; padding: 8px 12px; border-radius: 10px; align-self: flex-start;">${aiReply}</div>`;
-            } else {
-                throw new Error("Chybná odpoveď");
-            }
-        } catch (error) {
-            document.getElementById(loadingId).innerHTML = "Chyba: Skontroluj API kľúč alebo kredit.";
-            console.error(error);
-        }
-        
-        content.scrollTop = content.scrollHeight;
-    }
-
-    // Odoslanie enterom
-    document.getElementById('user-input').addEventListener('keypress', function (e) {
-        if (e.key === 'Enter') sendMessage();
-    });
 </script>
     </script>
     
@@ -1655,45 +1889,275 @@ window.addEventListener('DOMContentLoaded', () => {
         <button class="btn-cta" style="width: 100%; margin-top: 25px;" onclick="closeStoryModal()">POKRAČOVAŤ V CESTE</button>
     </div>
 </div>
-<div id="ai-assistant" style="position: fixed; bottom: 20px; right: 20px; z-index: 1000; font-family: 'Inter', sans-serif;">
-    <button onclick="toggleChat()" style="background: var(--primary); color: white; border: none; border-radius: 50%; width: 60px; height: 60px; cursor: pointer; box-shadow: 0 0 15px var(--primary-glow); font-size: 1.5rem;">
+
+
+<<div id="ai-assistant" style="position: fixed; bottom: 30px; right: 30px; z-index: 1000; font-family: 'Inter', sans-serif;">
+    <button onclick="toggleChat()" style="background: var(--primary); color: white; border: none; border-radius: 50%; width: 70px; height: 70px; cursor: pointer; box-shadow: 0 8px 25px var(--primary-glow); font-size: 2rem; transition: transform 0.2s;">
         🤖
     </button>
 
-    <div id="chat-window" style="display: none; position: absolute; bottom: 80px; right: 0; width: 300px; background: var(--card-bg); border: 1px solid var(--primary); border-radius: 15px; overflow: hidden; box-shadow: 0 10px 30px rgba(0,0,0,0.5);">
-        <div style="background: var(--primary); padding: 10px; font-weight: bold; text-align: center;">FitProgress AI Pomocník</div>
-        <div id="chat-content" style="height: 250px; padding: 10px; overflow-y: auto; font-size: 0.85rem; color: var(--text);">
-            <p><strong>AI:</strong> Ahoj! Som tvoj FitProgress asistent. Ako ti dnes môžem pomôcť s tréningom?</p>
+    <div id="chat-window" style="display: none; position: absolute; bottom: 90px; right: 0; width: 400px; height: 550px; background: var(--card-bg); border: 2px solid var(--primary); border-radius: 20px; overflow: hidden; box-shadow: 0 15px 50px rgba(0,0,0,0.9); flex-direction: column;">
+        
+        <div style="background: var(--primary); padding: 18px; font-weight: 900; text-align: center; color: white; font-size: 1.1rem; letter-spacing: 1px;">
+            FITPROGRESS AI COACH
         </div>
-        <div style="padding: 10px; border-top: 1px solid #333; display: flex;">
-            <input type="text" id="user-input" placeholder="Napíš správu..." style="flex: 1; background: #222; border: none; color: white; padding: 5px; border-radius: 5px;">
-            <button onclick="sendMessage()" style="background: var(--primary); border: none; color: white; margin-left: 5px; border-radius: 5px; cursor: pointer; padding: 5px 10px;">-></button>
+
+        <div id="chat-content" style="flex: 1; padding: 20px; overflow-y: auto; font-size: 1rem; color: var(--text); display: flex; flex-direction: column; gap: 15px; background: #080808;">
+            <div style="background: #222; padding: 12px 16px; border-radius: 15px 15px 15px 0px; align-self: flex-start; max-width: 85%; line-height: 1.5;">
+                Ahoj! Som tvoj vylepšený AI asistent. Pýtaj sa na čokoľvek ohľadom tréningu, vidím teraz všetko jasne! 🦾
+            </div>
+        </div>
+
+        <div style="padding: 15px; border-top: 1px solid #333; display: flex; background: var(--card-bg); gap: 10px;">
+            <input type="text" id="user-input" placeholder="Napíš svoju otázku..." 
+                style="flex: 1; background: #1a1a1a; border: 1px solid #444; color: white; padding: 12px 15px; border-radius: 10px; outline: none; font-size: 1rem;">
+            <button onclick="sendMessage()" 
+                style="background: var(--primary); border: none; color: white; padding: 10px 20px; border-radius: 10px; cursor: pointer; font-weight: bold; font-size: 1rem;">
+                POSLAŤ
+            </button>
         </div>
     </div>
 </div>
 
 <script>
+    let workoutTime = 0;
+let timerActive = false;
+
+function toggleTracker() {
+    const panel = document.getElementById('side-tracker');
+    panel.classList.toggle('active');
+    if(panel.classList.contains('active') && !timerActive) startTimer();
+}
+
+function startTimer() {
+    timerActive = true;
+    setInterval(() => {
+        workoutTime++;
+        let m = Math.floor(workoutTime / 60);
+        let s = workoutTime % 60;
+        document.getElementById('session-time').innerText = `${m}:${s < 10 ? '0' : ''}${s}`;
+    }, 1000);
+}
+
+function addExerciseCard(name) {
+    const body = document.getElementById('log-body');
+    const cardId = Date.now();
+    const card = document.createElement('div');
+    card.className = 'exercise-card';
+    card.id = `ex-${cardId}`;
+    
+    card.innerHTML = `
+        <div style="display:flex; justify-content:space-between; align-items:center;">
+            <h4 style="margin:0; font-size:1rem; color:var(--primary);">${name}</h4>
+            <button onclick="document.getElementById('ex-${cardId}').remove(); calculateStats();" style="background:none; border:none; color:#444; cursor:pointer;">✕</button>
+        </div>
+        <div class="set-labels" style="display:grid; grid-template-columns: 30px 1fr 60px 60px 60px 30px; gap:10px; margin-top:15px; font-size:0.6rem; color:#555; text-align:center;">
+            <div>TYP</div><div>CVIK</div><div>KG</div><div>OPAK.</div><div>%</div><div></div>
+        </div>
+        <div id="sets-container-${cardId}"></div>
+        <button class="add-set-btn" onclick="addSetRow('${cardId}', '${name}')">+ PRIDAŤ SÉRIU</button>
+    `;
+    body.appendChild(card);
+    addSetRow(cardId, name);
+}
+
+function addSetRow(cardId, name) {
+    const container = document.getElementById(`sets-container-${cardId}`);
+    const setNum = container.children.length + 1;
+    const row = document.createElement('div');
+    row.className = 'set-row';
+    row.innerHTML = `
+        <div class="set-type" onclick="toggleSetType(this)">N</div>
+        <div style="font-size:0.7rem; color:#888;">Séria ${setNum}</div>
+        <input type="number" class="set-input kg" placeholder="0" oninput="calculateStats()">
+        <input type="number" class="set-input reps" placeholder="0" oninput="calculateStats()">
+        <div style="font-size:0.7rem; color:var(--success);">100%</div>
+        <button onclick="this.parentElement.remove(); calculateStats();" style="background:none; border:none; color:#333; cursor:pointer;">✕</button>
+    `;
+    container.appendChild(row);
+    calculateStats();
+}
+
+function toggleSetType(el) {
+    if(el.innerText === 'N') { el.innerText = 'W'; el.className = 'set-type warmup'; }
+    else if(el.innerText === 'W') { el.innerText = 'D'; el.className = 'set-type dropset'; }
+    else { el.innerText = 'N'; el.className = 'set-type'; }
+}
+
+function calculateStats() {
+    let volume = 0;
+    let sets = 0;
+    document.querySelectorAll('.set-row').forEach(row => {
+        const kg = parseFloat(row.querySelector('.kg').value) || 0;
+        const reps = parseFloat(row.querySelector('.reps').value) || 0;
+        volume += (kg * reps);
+        sets++;
+    });
+    document.getElementById('total-volume').innerText = volume.toLocaleString();
+    document.getElementById('total-sets').innerText = sets;
+}
+
+function finishWorkout() {
+    const volume = document.getElementById('total-volume').innerText;
+    alert(`Tréning dokončený! \nCelkový objem: ${volume} kg. \nDobrá práca, tvoj progres bol uložený!`);
+    // Tu môžeš pridať ukladanie do localStorage
+    toggleTracker();
+}
+    /* --- LOGIKA PRE BEFORE/AFTER SLIDER --- */
+function slideCompare(slider) {
+    const val = slider.value;
+    // Zmení šírku horného obrázka
+    const container = slider.parentElement;
+    const topImage = container.querySelector('.modified');
+    const line = container.querySelector('.ba-line');
+    const btn = container.querySelector('.ba-button');
+    
+    topImage.style.width = val + "%";
+    
+    // Posunie čiaru a tlačidlo
+    line.style.left = val + "%";
+    btn.style.left = val + "%";
+}
+    // SEM VLOŽ SVOJ KĽÚČ (Musí začínať na AIza...)
+    const GEMINI_API_KEY = "AIzaSyCyDRFrb4FeVRv6DOwRhaDSxn94sCTxjqs"; 
+
     function toggleChat() {
         const chat = document.getElementById('chat-window');
-        chat.style.display = chat.style.display === 'none' ? 'block' : 'none';
+        chat.style.display = (chat.style.display === 'none' || chat.style.display === '') ? 'flex' : 'none';
     }
 
-    function sendMessage() {
-        const input = document.getElementById('user-input');
-        const content = document.getElementById('chat-content');
-        if (input.value.trim() !== "") {
-            content.innerHTML += `<p style="text-align:right;"><strong>Ty:</strong> ${input.value}</p>`;
-            
-            // Simulácia odpovede (Tu by sa neskôr napojilo API napr. od OpenAI)
-            setTimeout(() => {
-                content.innerHTML += `<p><strong>AI:</strong> To znie super! Na spaľovanie tuku ti odporúčam naše HIIT tréningy.</p>`;
-                content.scrollTop = content.scrollHeight;
-            }, 1000);
-            
-            input.value = "";
-            content.scrollTop = content.scrollHeight;
+    async function sendMessage() {
+    const input = document.getElementById('user-input');
+    const content = document.getElementById('chat-content');
+    const text = input.value.trim();
+
+    if (!text) return;
+
+    // 1. Zobraziť správu používateľa
+    content.innerHTML += '<div class="bubble user-bubble">' + text + '</div>';
+    input.value = "";
+    content.scrollTop = content.scrollHeight;
+
+    // 2. Zobraziť loading
+    const loadingId = "loading-" + Date.now();
+    content.innerHTML += '<div id="' + loadingId + '" class="bubble ai-bubble" style="color: #777;">Rozmýšľam...</div>';
+    content.scrollTop = content.scrollHeight;
+
+    // 3. Volanie API
+    try {
+        // Tu používame verziu v1 a model gemini-1.5-flash
+        const apiUrl = "https://generativelanguage.googleapis.com/v1/models/gemini-1.5-flash:generateContent?key=" + API_KEY;
+        
+        const response = await fetch(apiUrl, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                contents: [{
+                    parts: [{ text: "Odpovedaj stručne ako fitness tréner v slovenčine: " + text }]
+                }]
+            })
+        });
+
+        const data = await response.json();
+        
+        // Odstrániť loading
+        const loadEl = document.getElementById(loadingId);
+        if(loadEl) loadEl.remove();
+
+        if (data.candidates && data.candidates[0].content) {
+            const reply = data.candidates[0].content.parts[0].text;
+            content.innerHTML += '<div class="bubble ai-bubble">' + reply + '</div>';
+        } else {
+            // Ak Google vráti chybu v JSON formáte
+            console.error("API Error:", data);
+            content.innerHTML += '<div class="bubble ai-bubble" style="color:red;">Chyba: ' + (data.error ? data.error.message : "Neznáma chyba") + '</div>';
+        }
+    } catch (e) {
+        // Ak zlyhá samotné sieťové volanie (napr. blokovanie prehliadačom)
+        console.error("Network Error:", e);
+        const loadEl = document.getElementById(loadingId);
+        if(loadEl) loadEl.innerHTML = "<span style='color:red;'>Chyba pripojenia. Skús iný prehliadač alebo skontroluj internet.</span>";
+    }
+    content.scrollTop = content.scrollHeight;
+}
+/* --- COOKIE LOGIKA (Plne funkčná) --- */
+
+// Pomocná funkcia na nastavenie Cookie (exspirácia v dňoch)
+function setCookie(cname, cvalue, exdays) {
+    const d = new Date();
+    d.setTime(d.getTime() + (exdays * 24 * 60 * 60 * 1000));
+    let expires = "expires=" + d.toUTCString();
+    // Uloží cookie do prehliadača
+    document.cookie = cname + "=" + cvalue + ";" + expires + ";path=/;SameSite=Lax";
+}
+
+// Pomocná funkcia na získanie Cookie podľa mena
+function getCookie(cname) {
+    let name = cname + "=";
+    let decodedCookie = decodeURIComponent(document.cookie);
+    let ca = decodedCookie.split(';');
+    for(let i = 0; i < ca.length; i++) {
+        let c = ca[i];
+        while (c.charAt(0) == ' ') {
+            c = c.substring(1);
+        }
+        if (c.indexOf(name) == 0) {
+            return c.substring(name.length, c.length);
         }
     }
+    return "";
+}
+
+// Skontroluje pri načítaní stránky, či už máme súhlas
+function initCookieCheck() {
+    const userConsent = getCookie("fitProgressConsent");
+    
+    // Ak cookie neexistuje, ukáž banner
+    if (userConsent === "") {
+        setTimeout(() => {
+            document.getElementById('cookie-consent-banner').style.display = 'flex';
+        }, 1500); // Malé oneskorenie pre lepší efekt
+    } else {
+        console.log("Cookies už boli prijaté/odmietnuté: " + userConsent);
+    }
+}
+
+// Funkcia volaná tlačidlami v banneri
+function handleCookieConsent(accepted) {
+    const banner = document.getElementById('cookie-consent-banner');
+    
+    if (accepted) {
+        // Užívateľ súhlasil - uložíme na 365 dní
+        setCookie("fitProgressConsent", "accepted", 365);
+        alert("Ďakujeme! Tvoje nastavenia budú odteraz bezpečne uložené. 🦾");
+    } else {
+        // Užívateľ odmietol - uložíme informáciu, že nechce byť sledovaný (na 30 dní)
+        setCookie("fitProgressConsent", "declined", 30);
+    }
+
+    // Animácia zmiznutia
+    banner.style.opacity = "0";
+    banner.style.transform = "translate(-50%, 20px)";
+    setTimeout(() => {
+        banner.style.display = 'none';
+    }, 500);
+}
+
+// Spustiť kontrolu po načítaní stránky
+window.addEventListener('load', initCookieCheck);
 </script>
+    <div id="cookie-consent-banner" class="cookie-overlay">
+    <div class="cookie-content">
+        <h3>🍪 Cookies & Výkon</h3>
+        <p>
+            Aby tvoj progres na <b>FitProgress</b> ostal uložený (košík, prihlásenie, nastavenia), potrebujeme tvoj súhlas s používaním cookies. 
+            Bez nich budeš musieť všetko nastavovať znova pri každej návšteve.
+        </p>
+    </div>
+    <div class="cookie-actions">
+        <button class="btn-cookie-decline" onclick="handleCookieConsent(false)">Len nevyhnutné</button>
+        <button class="btn-cookie-accept" onclick="handleCookieConsent(true)">Súhlasiť a Pokračovať</button>
+    </div>
+</div>
 </body>
 </html>
