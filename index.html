@@ -1,2163 +1,420 @@
+import os
+from weasyprint import HTML
+
+html_content = """
 <!DOCTYPE html>
 <html lang="sk">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>FitProgress | Premium Experience</title>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700;900&display=swap" rel="stylesheet">
+    <title>Maturita - Slovenský jazyk a literatúra</title>
     <style>
-        :root {
-            --primary: #ff4d00;
-            --primary-glow: rgba(255, 77, 0, 0.4);
-            --bg: #050505;
-            --card-bg: #0f0f0f;
-            --text: #ffffff;
-            --text-dim: #888;
-            --success: #00ff00;
-            --m-blue: #0066cc;
-            --m-dark-blue: #004a99;
+        @page {
+            size: A4;
+            margin: 20mm 15mm;
+            background-color: #fdfbf7;
         }
-
-        body.light-mode { --bg: #ffffff; --text: #050505; }
-
-        /* NOVINKA: HARDCORE MODE EFEKT */
-        body.hardcore-mode {
-            animation: hardcore-pulse 2s infinite;
-        }
-        @keyframes hardcore-pulse {
-            0% { box-shadow: inset 0 0 50px rgba(255, 0, 0, 0.1); }
-            50% { box-shadow: inset 0 0 100px rgba(255, 0, 0, 0.2); }
-            100% { box-shadow: inset 0 0 50px rgba(255, 0, 0, 0.1); }
-        }
-
-        * { margin: 0; padding: 0; box-sizing: border-box; }
-
         body {
-            font-family: 'Inter', sans-serif;
-            background-color: var(--bg);
-            color: var(--text);
-            line-height: 1.6;
-            overflow-x: hidden;
-            transition: background-color 0.3s ease, color 0.3s ease;
+            font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+            font-size: 11pt;
+            line-height: 1.5;
+            color: #2b2b2b;
         }
-
-        /* --- SEARCH BAR ŠTÝLY --- */
-        .search-container {
-            position: relative;
-            margin: 0 15px;
+        h1 {
+            color: #800000;
+            font-size: 24pt;
+            text-align: center;
+            border-bottom: 2px solid #800000;
+            padding-bottom: 15px;
+            margin-bottom: 30px;
         }
-
-        .search-input {
-            background: #111;
-            border: 1px solid #333;
-            color: white;
-            padding: 8px 15px;
-            border-radius: 20px;
-            font-size: 0.8rem;
-            width: 280px;
-            transition: 0.3s;
+        h2 {
+            color: #1a4f76;
+            font-size: 16pt;
+            margin-top: 30px;
+            border-bottom: 1px solid #ccc;
+            padding-bottom: 5px;
+            page-break-after: avoid;
         }
-
-        .search-input:focus {
-            outline: none;
-            border-color: var(--primary);
-            width: 300px;
-            box-shadow: 0 0 10px var(--primary-glow);
+        h3 {
+            color: #333;
+            font-size: 12pt;
+            margin-top: 15px;
+            page-break-after: avoid;
         }
-
-        .search-results {
-            position: absolute;
-            top: 110%;
-            left: 0;
-            width: 100%;
-            background: #0f0f0f;
-            border: 1px solid #222;
-            border-radius: 10px;
-            display: none;
-            flex-direction: column;
-            z-index: 5000;
-            max-height: 250px;
-            overflow-y: auto;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.8);
+        p {
+            margin-bottom: 10px;
+            text-align: justify;
         }
-
-        .search-results a {
-            padding: 10px 15px;
-            color: var(--text-dim);
-            text-decoration: none;
-            font-size: 0.8rem;
-            border-bottom: 1px solid #161616;
-            transition: 0.2s;
-        }
-
-        .search-results a:hover {
-            background: #1a1a1a;
-            color: var(--primary);
-        }
-
-        /* --- DROPDOWN A SUBMENU ŠTÝLY --- */
-        .dropdown {
-            position: relative;
-            display: inline-block;
-            height: 100%;
-        }
-
-        .dropdown-content {
-            display: none;
-            position: absolute;
-            background-color: #0f0f0f;
-            min-width: 220px;
-            box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.8);
-            z-index: 3000;
-            border: 1px solid #222;
-            border-top: 3px solid var(--primary);
-            border-radius: 0 0 10px 10px;
-            top: 100%;
-            left: 0;
-        }
-
-        .dropdown:hover .dropdown-content {
-            display: block;
-            animation: fadeInUp 0.3s ease;
-        }
-
-        .submenu {
-            position: relative;
-        }
-
-        .submenu-content {
-            display: none;
-            position: absolute;
-            left: 100%; 
-            top: -1px;
-            background-color: #0f0f0f;
-            min-width: 200px;
-            border: 1px solid #222;
-            border-left: 3px solid var(--primary);
-            border-radius: 0 10px 10px 10px;
-            box-shadow: 10px 10px 30px rgba(0,0,0,0.5);
-        }
-
-        .submenu:hover .submenu-content {
-            display: block;
-            animation: fadeInRight 0.3s ease;
-        }
-
-        .dropdown-content a {
-            color: var(--text-dim) !important;
-            padding: 12px 16px;
-            text-decoration: none;
-            display: block;
-            font-size: 0.8rem !important;
-            text-transform: none !important;
-            border-bottom: 1px solid #1a1a1a;
-            text-align: left;
-            transition: 0.2s;
-        }
-
-        .dropdown-content a:hover {
-            background-color: #1a1a1a;
-            color: var(--primary) !important;
+        ul, ol {
+            margin-bottom: 15px;
             padding-left: 20px;
         }
-
-        @keyframes fadeInUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
-        @keyframes fadeInRight { from { opacity: 0; transform: translateX(15px); } to { opacity: 1; transform: translateX(0); } }
-        @keyframes shake { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.15); } }
-        @keyframes pulse-glow { 0% { box-shadow: 0 0 5px var(--primary); } 50% { box-shadow: 0 0 20px var(--primary); } 100% { box-shadow: 0 0 5px var(--primary); } }
-        
-        .cart-shake { animation: shake 0.4s ease; border-color: var(--primary) !important; color: var(--primary) !important; }
-        .recommended-active { border: 2px solid var(--primary) !important; animation: pulse-glow 2s infinite; transform: scale(1.02); }
-
-        .overlay-screen {
-            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background: radial-gradient(circle at center, #1a1a1a 0%, #050505 100%);
-            display: flex; justify-content: center; align-items: center; z-index: 9999;
-            overflow-y: auto; padding: 20px 0;
+        li {
+            margin-bottom: 5px;
         }
-
-        .auth-container {
-            background: var(--card-bg); padding: 40px; border-radius: 30px;
-            width: 90%; max-width: 450px; text-align: center; border: 1px solid #222;
+        .highlight {
+            background-color: #f4ecec;
+            padding: 12px;
+            border-left: 4px solid #800000;
+            margin: 15px 0;
+            border-radius: 3px;
+            page-break-inside: avoid;
         }
-
-        .auth-tabs { display: flex; gap: 10px; margin-bottom: 25px; background: #000; padding: 5px; border-radius: 15px; }
-        .tab-btn { flex: 1; padding: 10px; border-radius: 12px; border: none; background: transparent; color: var(--text-dim); cursor: pointer; font-weight: 700; transition: 0.3s; }
-        .tab-btn.active { background: var(--primary); color: white; }
-
-        input, select, textarea {
-            width: 100%; padding: 15px; margin: 10px 0; border-radius: 12px;
-            border: 1px solid #333; background: #000; color: white; font-family: inherit; font-size: 0.9rem;
+        .grammar-box {
+            background-color: #eaf2f8;
+            padding: 15px;
+            border: 1px solid #c4d9eb;
+            border-radius: 5px;
+            margin: 20px 0;
         }
-        textarea { height: 80px; resize: none; }
-
-        #main-web-content, #onboarding-screen { display: none; }
-        #auth-screen { display: flex; }
-
-        nav {
-            display: flex; justify-content: space-between; align-items: center;
-            padding: 20px 10%; background: rgba(0,0,0,0.7); backdrop-filter: blur(20px);
-            position: fixed; width: 100%; top: 0; z-index: 2000; border-bottom: 1px solid rgba(255,255,255,0.05);
+        .title-page {
+            height: 850px;
+            display: block;
+            text-align: center;
+            padding-top: 200px;
         }
-
-        .logo { font-size: 1.4rem; font-weight: 900; text-transform: uppercase; }
-        .logo span { color: var(--primary); }
-        .links { display: flex; align-items: center; gap: 35px; }
-        .links a { color: white; text-decoration: none; font-weight: 700; font-size: 0.75rem; text-transform: uppercase; transition: 0.3s; }
-        .links a:hover { color: var(--primary); }
-
-        .cart-btn {
-            background: #111; border: 1px solid #222; color: white; padding: 8px 15px;
-            border-radius: 8px; cursor: pointer; font-weight: 700; font-size: 0.7rem; transition: 0.3s;
+        .title-page h1 {
+            border: none;
+            font-size: 32pt;
         }
-
-        .profile-icon {
-            width: 35px; height: 35px; border-radius: 50%; background: #222;
-            cursor: pointer; display: flex; align-items: center; justify-content: center;
-            border: 1px solid #444; overflow: hidden;
+        .title-page p {
+            font-size: 16pt;
+            text-align: center;
+            color: #555;
         }
-        .profile-icon img { width: 100%; height: 100%; object-fit: cover; }
-        .profile-icon svg { width: 20px; fill: white; }
-
-        .trust-bar {
-            background: #0a0a0a; padding: 20px 10%; display: flex; justify-content: space-around;
-            flex-wrap: wrap; gap: 20px; border-top: 1px solid #111; border-bottom: 1px solid #111;
+        .page-break {
+            page-break-before: always;
         }
-        .trust-item { color: var(--text-dim); font-size: 0.75rem; font-weight: 700; text-transform: uppercase; display: flex; align-items: center; gap: 10px; }
-        .trust-item span { color: var(--primary); font-size: 1.2rem; }
-
-        .hero {
-            height: 100vh; position: relative; display: flex; align-items: center; padding: 0 10%;
-            overflow: hidden;
+        .important {
+            font-weight: bold;
+            color: #a00;
         }
-        .hero-video-bg {
-            position: absolute; top: 50%; left: 50%; min-width: 100%; min-height: 100%;
-            width: auto; height: auto; z-index: -1; transform: translateX(-50%) translateY(-50%);
-            object-fit: cover; filter: brightness(0.4);
-        }
-
-        .hero-text { flex: 1.2; z-index: 10; animation: fadeInUp 1s ease forwards; }
-        .hero-text h1 { font-size: 4.5rem; line-height: 1; margin-bottom: 20px; font-weight: 900; }
-        .hero-text h1 span { color: var(--primary); text-shadow: 0 0 30px var(--primary-glow); }
-        .hero-text p { color: var(--text-dim); font-size: 1.1rem; max-width: 500px; margin-bottom: 40px; }
-
-        .social-proof { display: flex; align-items: center; gap: 10px; margin-top: 25px; }
-        .user-avatars { display: flex; margin-right: 5px; }
-        .user-avatars img { width: 35px; height: 35px; border-radius: 50%; border: 2px solid #050505; margin-left: -12px; transition: 0.3s; }
-        .user-avatars img:first-child { margin-left: 0; }
-        .social-proof span { font-size: 0.8rem; color: var(--text-dim); font-weight: 600; }
-
-        .btn-cta {
-            background: var(--primary); color: white; text-decoration: none;
-            padding: 20px 50px; border-radius: 12px; font-weight: 900;
-            text-transform: uppercase; display: inline-block; transition: 0.3s;
-            box-shadow: 0 10px 40px var(--primary-glow); border: none; cursor: pointer;
-        }
-        .btn-cta:hover { transform: translateY(-3px); filter: brightness(1.1); }
-        .btn-cta:active { transform: scale(0.96); }
-
-        .hero-image { flex: 0.8; text-align: right; z-index: 10; animation: fadeInUp 1.2s ease forwards; }
-        .hero-image img { width: 100%; max-width: 500px; border-radius: 30px; filter: drop-shadow(0 0 50px rgba(255,77,0,0.2)); }
-
-        
-
-        .faq-container { max-width: 800px; margin: 0 auto; text-align: left; }
-        .faq-item { background: #0f0f0f; margin-bottom: 12px; border-radius: 15px; overflow: hidden; border: 1px solid #1a1a1a; transition: 0.3s; cursor: pointer; }
-        .faq-item:hover { border-color: var(--primary); }
-        .faq-question { padding: 20px; display: flex; justify-content: space-between; font-weight: 700; font-size: 0.95rem; }
-        .faq-answer { padding: 0 20px; max-height: 0; overflow: hidden; transition: 0.4s ease-out; color: var(--text-dim); font-size: 0.9rem; }
-        .faq-item.active .faq-answer { padding: 0 20px 20px; max-height: 200px; }
-        .faq-item.active .faq-question span { transform: rotate(45deg); color: var(--primary); }
-
-        #news-popup {
-            position: fixed; inset: 0; background: rgba(0,0,0,0.9); z-index: 10000;
-            display: none; justify-content: center; align-items: center;
-        }
-
-        .section-title { text-align: center; margin-bottom: 50px; font-size: 2.5rem; font-weight: 900; }
-        .section-title span { color: var(--primary); }
-
-
-        .grid-container { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 25px; margin-top: 50px; }
-        .offer-card { background: var(--card-bg); border-radius: 20px; padding: 15px; border: 1px solid #1a1a1a; transition: 0.4s; position: relative; overflow: hidden; }
-        .offer-card:hover { transform: translateY(-8px); border-color: var(--primary); }
-        .offer-card img { width: 100%; height: 200px; object-fit: cover; border-radius: 15px; margin-bottom: 15px; }
-        
-        .rec-badge { position: absolute; top: 10px; right: 10px; background: var(--primary); color: white; padding: 5px 12px; border-radius: 20px; font-size: 0.6rem; font-weight: 900; display: none; z-index: 10; }
-
-        .card-price { font-size: 1.3rem; font-weight: 900; color: var(--primary); margin-bottom: 15px; }
-        .old-price { font-size: 0.9rem; text-decoration: line-through; color: var(--text-dim); margin-right: 10px; }
-
-        .progress-container { background: #222; border-radius: 10px; height: 8px; margin: 15px 0; overflow: hidden; }
-        .progress-bar { background: var(--primary); height: 100%; width: 0%; transition: 0.5s; box-shadow: 0 0 10px var(--primary); }
-        .modal { position: fixed; inset: 0; background: rgba(0,0,0,0.95); display: none; justify-content: center; align-items: center; z-index: 5000; padding: 20px; }
-        .modal-content { background: #111; padding: 40px; border-radius: 30px; width: 100%; max-width: 420px; border: 1px solid #222; text-align: center; }
-        
-        .cart-item {
-            display: flex; justify-content: space-between; align-items: center;
-            background: #1a1a1a; padding: 12px; border-radius: 8px; margin-bottom: 10px;
-            border: 1px solid #222; transition: 0.2s;
-        }
-        .cart-item:hover { border-color: var(--primary); }
-        .remove-btn {
-            background: rgba(255,50,50,0.2); color: #ff5555; border: none; width: 25px; height: 25px;
-            border-radius: 5px; cursor: pointer; display: flex; align-items: center; justify-content: center; font-weight: 900;
-        }
-        .remove-btn:hover { background: #ff5555; color: white; }
-
-        .profile-expanded {
-            max-width: 1000px !important; width: 95% !important; padding: 0 !important;
-            display: flex; min-height: 600px; overflow: hidden; text-align: left !important;
-        }
-        .profile-sidebar {
-            width: 280px; background: #080808; border-right: 1px solid #222; padding: 40px 25px;
-            display: flex; flex-direction: column; gap: 10px;
-        }
-        .sidebar-user { text-align: center; margin-bottom: 30px; }
-        .sidebar-user img { width: 85px; height: 85px; border-radius: 50%; border: 3px solid var(--primary); padding: 3px; margin-bottom: 12px; object-fit: cover; }
-        .sidebar-user h4 { font-size: 1.1rem; color: white; font-weight: 900; }
-        .sidebar-user p { font-size: 0.75rem; color: var(--primary); font-weight: 700; text-transform: uppercase; letter-spacing: 1px; }
-
-        .sidebar-item {
-            padding: 14px 18px; border-radius: 12px; cursor: pointer; color: var(--text-dim);
-            font-weight: 700; font-size: 0.9rem; transition: 0.3s; display: flex; align-items: center; gap: 12px;
-        }
-        .sidebar-item:hover { background: #151515; color: white; }
-        .sidebar-item.active { background: rgba(255, 77, 0, 0.1); color: var(--primary); border-left: 4px solid var(--primary); }
-
-        .profile-body { flex: 1; padding: 50px; overflow-y: auto; background: #111; }
-        .profile-section { display: none; }
-        .profile-section.active { display: block; animation: fadeInUp 0.4s ease; }
-
-        .stat-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; margin-top: 25px; }
-        .stat-box { background: #000; padding: 25px; border-radius: 20px; border: 1px solid #222; transition: 0.3s; }
-        .stat-box:hover { border-color: var(--primary); transform: translateY(-5px); }
-        .stat-box small { color: var(--text-dim); font-size: 0.7rem; text-transform: uppercase; letter-spacing: 1px; }
-        .stat-box h3 { color: var(--primary); margin-top: 8px; font-size: 1.8rem; font-weight: 900; }
-
-        .plan-item { 
-            background: #000; border: 1px solid #222; padding: 20px; border-radius: 20px; 
-            display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;
-            transition: 0.3s;
-        }
-        .plan-item:hover { border-color: #444; }
-        .plan-info h4 { color: white; margin-bottom: 5px; font-size: 1rem; }
-        .plan-status { font-size: 0.65rem; padding: 4px 10px; border-radius: 8px; background: rgba(0,255,0,0.1); color: #00ff00; font-weight: 900; }
-        .btn-download { background: #1a1a1a; color: white; padding: 10px 20px; border-radius: 10px; border: 1px solid #333; cursor: pointer; font-weight: 700; font-size: 0.8rem; transition: 0.3s; }
-        .btn-download:hover { background: var(--primary); border-color: var(--primary); color: white; }
-
-        .achievements { display: flex; gap: 15px; margin-top: 20px; }
-        .ach-icon { width: 55px; height: 55px; background: #1a1a1a; border-radius: 15px; display: flex; align-items: center; justify-content: center; font-size: 1.5rem; filter: grayscale(1); opacity: 0.4; transition: 0.3s; }
-        .ach-icon.unlocked { filter: grayscale(0); opacity: 1; border: 1px solid var(--primary); background: rgba(255,77,0,0.1); cursor: help; }
-
-        .avatar-options { display: flex; gap: 10px; justify-content: flex-start; margin: 15px 0 25px; overflow-x: auto; padding-bottom: 10px; }
-        .avatar-img { width: 50px; height: 50px; border-radius: 50%; cursor: pointer; border: 2px solid transparent; transition: 0.2s; flex-shrink: 0; }
-        .avatar-img:hover { transform: scale(1.1); }
-        .avatar-img.active-avatar { border-color: var(--primary); }
-
-        .settings-group { margin-bottom: 25px; background: #000; padding: 20px; border-radius: 15px; border: 1px solid #222; }
-        .settings-group h4 { font-size: 0.8rem; color: var(--primary); text-transform: uppercase; margin-bottom: 15px; letter-spacing: 1px; }
-
-        .toggle-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; }
-        .toggle-row span { font-size: 0.9rem; color: white; }
-        
-        .switch { position: relative; display: inline-block; width: 40px; height: 20px; }
-        .switch input { opacity: 0; width: 0; height: 0; }
-        .slider { position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; background-color: #333; transition: .4s; border-radius: 20px; }
-        .slider:before { position: absolute; content: ""; height: 14px; width: 14px; left: 3px; bottom: 3px; background-color: white; transition: .4s; border-radius: 50%; }
-        input:checked + .slider { background-color: var(--primary); }
-        input:checked + .slider:before { transform: translateX(20px); }
-
-        .newsletter-footer {
-            background-color: #333; padding: 40px 10%; display: flex;
-            justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 20px;
-        }
-        .newsletter-text h2 { font-weight: 900; font-size: 1.5rem; }
-        .newsletter-text p { font-size: 0.9rem; opacity: 0.9; }
-        .newsletter-form { display: flex; gap: 10px; flex: 1; max-width: 500px; }
-        .newsletter-form input { margin: 0; background: white; color: black; border: none; }
-        .newsletter-form button { 
-            background: var(--m-blue); color: white; padding: 0 25px; 
-            border-radius: 12px; border: none; font-weight: 700; cursor: pointer;
-            text-transform: uppercase; font-size: 0.8rem;
-        }
-
-        .footer-main {
-            background-color: #050505; padding: 60px 10%; display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 40px; text-align: left;
-        }
-        .footer-col h4 { margin-bottom: 20px; text-transform: uppercase; font-size: 0.9rem; letter-spacing: 1px; }
-        .footer-col ul { list-style: none; }
-        .footer-col ul li { margin-bottom: 10px; }
-        .footer-col ul li a { color: rgba(255,255,255,0.7); text-decoration: none; font-size: 0.85rem; transition: 0.3s; }
-        .footer-col ul li a:hover { color: white; padding-left: 5px; }
-
-        .footer-bottom { 
-            background: #000000; padding: 20px 10%; text-align: center; 
-            font-size: 0.7rem; color: rgba(255,255,255,0.5); 
-        }
-
-        #sales-notification {
-            position: fixed; bottom: 20px; left: 20px; background: var(--card-bg);
-            border: 1px solid var(--primary); padding: 15px; border-radius: 15px;
-            display: flex; align-items: center; gap: 15px; z-index: 4000;
-            transform: translateX(-150%); transition: 0.5s cubic-bezier(0.68, -0.55, 0.27, 1.55); 
-            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
-        }
-        #sales-notification.show { transform: translateX(0); }
-
-        .timer-banner { background: var(--primary); color: white; padding: 10px; text-align: center; font-weight: 900; font-size: 0.8rem; letter-spacing: 1px; }
-
-        html { scroll-behavior: smooth; }
-        /* --- FIT-PRO TABUĽKA ŠTÝLY --- */
-.comparison-section {
-    padding: 100px 10%;
-    background: #050505;
-}
-.comparison-table {
-    width: 100%;
-    border-collapse: collapse;
-    margin-top: 30px;
-    background: var(--card-bg);
-    border-radius: 20px;
-    overflow: hidden;
-    border: 1px solid #1a1a1a;
-}
-.comparison-table th, .comparison-table td {
-    padding: 20px;
-    text-align: center;
-    border-bottom: 1px solid #1a1a1a;
-}
-.comparison-table th {
-    background: #111;
-    color: var(--primary);
-    text-transform: uppercase;
-    font-size: 0.9rem;
-    font-weight: 900;
-}
-.comparison-table td:first-child {
-    text-align: left;
-    font-weight: 700;
-    color: var(--text-dim);
-}
-.comparison-table .check { color: var(--success); font-weight: 900; }
-.comparison-table .cross { color: #ff3232; font-weight: 900; }
-.pro-column { background: rgba(255, 77, 0, 0.05); border-left: 2px solid var(--primary); border-right: 2px solid var(--primary); }
-/* KOMPLETNÁ OPRAVA SVETLÉHO REŽIMU */
-body.light-mode {
-    --bg: #ffffff;
-    --text: #0a0a0a;
-    --card-bg: #f0f0f0;
-    --text-dim: #444444;
-}
-
-/* Oprava navigačnej lišty */
-body.light-mode nav {
-    background: rgba(255, 255, 255, 0.98) !important;
-    border-bottom: 2px solid #eeeeee !important;
-    box-shadow: 0 2px 10px rgba(0,0,0,0.05) !important;
-}
-
-/* Všetky texty v navigácii na ČIERNO */
-body.light-mode nav a, 
-body.light-mode nav .logo, 
-body.light-mode nav div,
-body.light-mode .nav-links a {
-    color: #000000 !important;
-}
-
-/* Oprava BMI tabuľky a kariet plánov v svetlom režime */
-body.light-mode .bmi-card, 
-body.light-mode .plan-card {
-    background: #ffffff !important;
-    border: 1px solid #dddddd !important;
-    color: #000000 !important;
-}
-
-body.light-mode .bmi-card h2, 
-body.light-mode .bmi-card h3,
-body.light-mode .plan-card h3 {
-    color: #000000 !important;
-}
-
-/* Vstupné polia v svetlom režime */
-body.light-mode input {
-    background: #f9f9f9 !important;
-    border: 2px solid #dddddd !important;
-    color: #000000 !important;
-}
-
-/* Ikona v prepínači */
-body.light-mode .theme-switch {
-    background: #eeeeee;
-    color: #000000;
-}
-
-/* --- COOKIE BANNER ŠTÝLY --- */
-.cookie-overlay {
-    position: fixed;
-    bottom: 20px;
-    left: 50%;
-    transform: translateX(-50%);
-    width: 90%;
-    max-width: 600px;
-    background: rgba(15, 15, 15, 0.95);
-    border: 1px solid var(--primary);
-    border-radius: 20px;
-    padding: 25px;
-    display: none; /* Skryté, kým JS nepovie inak */
-    flex-direction: column;
-    gap: 15px;
-    z-index: 10000;
-    box-shadow: 0 10px 50px rgba(0,0,0,0.8);
-    backdrop-filter: blur(10px);
-    animation: slideUp 0.5s ease-out;
-}
-
-@keyframes slideUp {
-    from { transform: translate(-50%, 100px); opacity: 0; }
-    to { transform: translate(-50%, 0); opacity: 1; }
-}
-
-.cookie-content h3 {
-    color: var(--primary);
-    font-weight: 900;
-    margin-bottom: 5px;
-    text-transform: uppercase;
-    display: flex;
-    align-items: center;
-    gap: 10px;
-}
-
-.cookie-content p {
-    font-size: 0.85rem;
-    color: var(--text-dim);
-    line-height: 1.5;
-}
-
-.cookie-actions {
-    display: flex;
-    gap: 10px;
-    margin-top: 10px;
-}
-
-.btn-cookie-accept {
-    flex: 1;
-    background: var(--primary);
-    color: white;
-    border: none;
-    padding: 12px;
-    border-radius: 10px;
-    font-weight: 900;
-    cursor: pointer;
-    text-transform: uppercase;
-    transition: 0.3s;
-}
-
-.btn-cookie-accept:hover {
-    background: #ff6600;
-    box-shadow: 0 0 15px var(--primary-glow);
-}
-
-.btn-cookie-decline {
-    flex: 1;
-    background: transparent;
-    color: var(--text-dim);
-    border: 1px solid #333;
-    padding: 12px;
-    border-radius: 10px;
-    font-weight: 700;
-    cursor: pointer;
-    transition: 0.3s;
-}
-
-.btn-cookie-decline:hover {
-    border-color: #fff;
-    color: #fff;
-}
-/* MODERNÝ WORKOUT ENGINE PRO */
-.side-panel {
-    position: fixed;
-    top: 0;
-    right: -520px; 
-    width: 520px;
-    height: 100%;
-    background: rgba(8, 8, 8, 0.95);
-    backdrop-filter: blur(25px);
-    border-left: 1px solid rgba(255, 77, 0, 0.2);
-    z-index: 9999;
-    transition: 0.5s cubic-bezier(0.16, 1, 0.3, 1);
-    display: flex;
-    flex-direction: column;
-    box-shadow: -15px 0 50px rgba(0,0,0,0.8);
-}
-
-.side-panel.active { right: 0; }
-
-.side-header {
-    padding: 30px;
-    border-bottom: 1px solid rgba(255,255,255,0.05);
-}
-
-.workout-stats-mini {
-    display: flex;
-    gap: 20px;
-    margin-top: 15px;
-}
-
-.stat-v {
-    font-size: 0.7rem;
-    color: var(--text-dim);
-}
-
-.stat-v span {
-    display: block;
-    color: var(--primary);
-    font-weight: 900;
-    font-size: 1rem;
-}
-
-/* Karty cvikov */
-.exercise-card {
-    background: #121212;
-    border: 1px solid #222;
-    border-radius: 18px;
-    padding: 20px;
-    margin: 0 25px 20px 25px;
-    transition: 0.3s;
-}
-
-.exercise-card:hover { border-color: var(--primary-glow); }
-
-.set-row {
-    display: grid;
-    grid-template-columns: 30px 1fr 60px 60px 60px 30px;
-    gap: 10px;
-    align-items: center;
-    margin-top: 10px;
-    padding: 5px 0;
-}
-
-.set-type {
-    font-size: 0.6rem;
-    font-weight: 900;
-    background: #222;
-    color: var(--text-dim);
-    border-radius: 4px;
-    text-align: center;
-    padding: 2px 0;
-    cursor: pointer;
-}
-
-.set-type.dropset { color: #0088ff; border: 1px solid #0088ff; }
-.set-type.warmup { color: #ffcc00; border: 1px solid #ffcc00; }
-
-.set-input {
-    background: #000;
-    border: 1px solid #333;
-    color: white;
-    padding: 8px;
-    border-radius: 6px;
-    text-align: center;
-    font-size: 0.9rem;
-    width: 100%;
-}
-
-.set-input:focus { border-color: var(--primary); outline: none; }
-
-.add-set-btn {
-    background: none;
-    border: 1px dashed #444;
-    color: #666;
-    width: 100%;
-    padding: 8px;
-    border-radius: 8px;
-    margin-top: 15px;
-    cursor: pointer;
-    font-size: 0.75rem;
-    font-weight: bold;
-}
-
-.add-set-btn:hover { border-color: var(--primary); color: var(--primary); }
     </style>
 </head>
-<body id="main-body">
+<body>
 
-    <div class="timer-banner" id="promo-banner">LIMITOVANÁ PONUKA KONČÍ O: <span id="countdown">00:00:00</span> | PRÁVE PREZERÁ: <span id="active-users">24</span> ĽUDÍ</div>
-
-    <section id="auth-screen" class="overlay-screen">
-        <div class="auth-container">
-            <div class="logo" style="margin-bottom: 20px;">FIT<span>PROGRESS</span></div>
-            <div class="auth-tabs">
-                <button class="tab-btn active" id="tab-login" onclick="switchAuth('login')">Prihlásenie</button>
-                <button class="tab-btn" id="tab-reg" onclick="switchAuth('reg')">Registrácia</button>
-            </div>
-            <div id="auth-fields">
-                <h2 id="auth-title">Vitaj späť!</h2>
-                <input type="email" id="email" placeholder="Emailová adresa">
-                <input type="password" id="password" placeholder="Heslo">
-                <div id="reg-extra" style="display: none;">
-                    <input type="text" id="username" placeholder="Celé meno">
-                </div>
-                <button class="btn-cta" style="width: 100%; padding: 15px; margin-top: 10px;" onclick="handleAuth()">POKRAČOVAŤ</button>
-            </div>
-        </div>
-    </section>
-
-    <div id="news-popup">
-        <div class="auth-container" id="news-content">
-            <h2 style="color: var(--primary);">POČKAJ! 🎁</h2>
-            <p style="margin: 15px 0; color: var(--text-dim);">Neodchádzaj naprázdno. Získaj náš <b>TOP 5 Receptár</b> pre svalový rast úplne zadarmo do e-mailu.</p>
-            <input type="email" id="news-email" placeholder="Tvoj najlepší email">
-            <button class="btn-cta" style="width: 100%; margin-top: 10px;" onclick="submitNewsletter()">POSLAŤ RECEPTY</button>
-            <p style="cursor: pointer; margin-top: 15px; font-size: 0.7rem; color: #444;" onclick="closeNews()">Nie, chcem radšej pokračovať v nákupoch</p>
-        </div>
+    <div class="title-page">
+        <h1>Kompletný maturitný sprievodca</h1>
+        <p>Slovenský jazyk a literatúra</p>
+        <p><i>Spracované témy z literatúry (30 zadaní) a prehľad gramatiky</i></p>
     </div>
 
-    <section id="onboarding-screen" class="overlay-screen">
-        <div class="auth-container" style="max-width: 500px;">
-            <h2 id="welcome-user">Skvelé!</h2>
-            <p style="color: var(--text-dim); margin-bottom: 20px;">Povedz nám o svojich cieľoch.</p>
-            <div style="text-align: left;">
-                <label style="font-size: 0.8rem; color: var(--primary); font-weight: 700;">AKÝ JE TVOJ CIEĽ?</label>
-                <select id="goal">
-                    <option value="objem">Chcem nabrať masívny objem</option>
-                    <option value="chudnutie">Chcem schudnúť a vyrysovať</option>
-                    <option value="sila">Chcem len silu a kondíciu</option>
-                </select>
-                <label style="font-size: 0.8rem; color: var(--primary); font-weight: 700;">PREČO SI TU? (TVOJA MOTIVÁCIA)</label>
-                <textarea id="motivation" placeholder="Napr. Chcem sa cítiť lepšie v plavkách..."></textarea>
-                <label style="font-size: 0.8rem; color: var(--primary); font-weight: 700;">SKÚSENOSTI S CVIČENÍM</label>
-                <select id="experience">
-                    <option value="0">Úplný začiatočník</option>
-                    <option value="1">Cvičím menej ako rok</option>
-                    <option value="2">Skúsený (1-3 roky)</option>
-                    <option value="3">Pro (viac ako 3 roky)</option>
-                </select>
-            </div>
-            <button class="btn-cta" style="width: 100%; padding: 15px; margin-top: 20px;" onclick="finishOnboarding()">DOKONČIŤ NASTAVENIE</button>
-        </div>
-        
-    </section>
+    <div class="page-break"></div>
 
-    <div id="main-web-content">
-        <nav>
-            <div class="logo">FIT<span>PROGRESS</span></div>
-            
-            <div class="search-container">
-                <input type="text" class="search-input" placeholder="Hľadať produkt..." id="site-search" onkeyup="filterSearch()">
-                <div class="search-results" id="search-results">
-                    </div>
-            </div>
-
-            <div class="links">
-                <a href="#">Domov</a>
-                
-                <div class="dropdown">
-                    <a href="#" style="cursor: default;">Produkty ▾</a>
-                    <div class="dropdown-content">
-                        <div class="submenu">
-                            <a href="proteiny.html">Proteíny <span style="float:right;">▸</span></a>
-                            <div class="submenu-content">
-                                <a href="srvatkovy-koncentrat.html">Srvátkový Koncentrát</a>
-                                <a href="srvatkovy-izolat.html">Srvátkový Izolát</a>
-                                <a href="vegansky-protein.html">Vegánsky Proteín</a>
-                                <a href="nocny-kazein.html">Nočný Kazeín</a>
-                            </div>
-                        </div>
-                        <div class="submenu">
-                            <a href="kreatin.html">Kreatín <span style="float:right;">▸</span></a>
-                           <div class="submenu-content">
-                               <a href="kreatin-monohydrat.html">Kreatín Monohydrát</a>
-                               <a href="kreatin-hc1.html">Kreatín HCl</a>
-                               <a href="kre-alkalyn.html">Kre-Alkalyn</a>
-                               <a href="viaczlozkove-kreatiny.html">Viaczložkové kreatíny</a>
-                            </div>
-                        </div>
-                        
-                        <div class="submenu">
-    <a href="predtreningovky.html">Predtréningovky <span style="float:right;">▸</span></a>
-    <div class="submenu-content">
-        <a href="stimulanty.html">So stimulantmi (Kofeín)</a>
-        <a href="pumpa.html">Bez stimulantov (Pumpa)</a>
-        <a href="shopy.html">Tekuté (Shot)</a>
-        <a href="focus.html">Focus & Energia</a>
-    </div>
-</div>
-                        
-                        <div class="submenu">
-    <a href="vitaminy.html">Vitamíny a Minerály <span style="float:right;">▸</span></a>
-    <div class="submenu-content">
-        <a href="multivitaminy.html">Multivitamíny</a>
-        <a href="klbova-vyziva.html">Kĺbová výživa</a>
-        <a href="magnezium-zinok.html">Magnézium a Zinok</a>
-        <a href="omega-3.html">Omega 3 (Rybí olej)</a>
-        <a href="imunita.html">Podpora imunity</a>
-    </div>
-</div>
-                        
-                        <div class="submenu">
-    <a href="prislusenstvo.html">Príslušenstvo <span style="float:right;">▸</span></a>
-    <div class="submenu-content">
-        <a href="trhacky-opasky.html">Trhačky a Opasky</a>
-        <a href="sejkre-flase.html">Šejkre a Fľaše</a>
-        <a href="rukavice.html">Rukavice na cvičenie</a>
-        <a href="odporove-gumy.html">Odporové gumy</a>
-        <a href="ostatne.html">Ostatné doplnky</a>
-    </div>
-</div>
-                    </div>
-                </div>
-
-                <div class="dropdown">
-                    <a href="#ponuka" style="cursor: default;">Plány ▾</a>
-                    <div class="dropdown-content">
-                        <a href="#card-objem">Objemový Kráľ</a>
-                        <a href="#card-chudnutie">Rysovacia Biblia</a>
-                        <a href="#card-sila">Domáci Warrior</a>
-                        <a href="#">Individuálny Coaching</a>
-                    </div>
-                </div>
-
-                <a href="#bmi">Kalkulačka</a>
-                <a href="kontakt.html">Kontakt</a>
-                <button class="cart-btn" id="cart-nav-btn" onclick="openCart()">KOŠÍK (<span id="cart-count">0</span>)</button>
-                <div class="theme-switch" onclick="toggleTheme()" title="Zmeniť režim">
-    <span id="theme-icon">🌙</span>
+    <h1>1. Časť: Literatúra - Vypracované témy</h1>
     
-</div>
+    <h2>1. Klasicizmus, osvietenstvo</h2>
+    <p><b>Znaky:</b> Rozum (racionalizmus), jasnosť, presnosť. Rozdelenie žánrov na vysoké (óda, epos, tragédia) a nízke (bájka, satira, komédia). Ne prelínajú sa.</p>
+    <div class="highlight">
+        <b>Princíp časomiery:</b> Rytmický systém založený na striedaní dlhých a krátkych slabík (nie na prízvuku). Základnou jednotkou je móra.<br>
+        <b>Pojem epos:</b> Rozsiahle epické veršované dielo. Má presnú štruktúru (propozícia, invokácia, in medias res...).
+    </div>
+    <ul>
+        <li><b>Ján Hollý - Svätopluk:</b> Hrdinský epos v časomiere (hexameter). Oslavuje minulosť Slovákov, Svätopluk je tu ideálny panovník.</li>
+        <li><b>Anton Bernolák:</b> Prvý kodifikátor spisovnej slovenčiny (1787 - Jazykovedno-kritická rozprava o slovenských písmenách), základom bola kultúrna západoslovenčina.</li>
+        <li><b>Juraj Fándly:</b> Dúverná zmlúva medzi mňíchom a diáblom (popularizácia reforiem Jozefa II., napísané v bernolákovčine).</li>
+        <li><b>Jozef Ignác Bajza:</b> René mládenca príhodi a skúsenosťi (prvý slovenský román, napísaný v jeho vlastnom jazyku, plný didaktiky).</li>
+    </ul>
 
-                <div class="profile-icon" id="user-profile-btn" onclick="openProfile()">
-                    <svg viewBox="0 0 24 24" id="default-svg"><path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/></svg>
-                </div>
+    <h2>2. Dráma po 1945 na Slovensku</h2>
+    <p><b>Prehľad tém:</b> Vyrovnávanie sa s 2. sv. vojnou, neskôr kritika spoločnosti (aj komunistickej v obdobiach uvoľnenia), absurdná dráma, autorské divadlá.</p>
+    <ul>
+        <li><b>Ivan Bukovčan - Kým kohút nezaspieva:</b> Existencializmus. 10 rukojemníkov v pivnici počas SNP. Majú vybrať jedného, ktorý zomrie, inak zomrú všetci. Skúška charakterov, hraničná situácia (Fičúr vs. Ondrej, Holub).</li>
+        <li><b>Milan Lasica a Július Satinský - Soirée:</b> Autorské divadlo, intelektuálny humor, satira, dialógy rozbíjajúce klišé.</li>
+        <li><b>Stanislav Štepka - Jááánošííík:</b> Radošinské naivné divadlo. Demýtizácia a paródia národného hrdinu (zbojníka). Ľudový jazyk (radošinský dialekt), pesničky.</li>
+    </ul>
 
-                <button class="cart-btn" style="background: transparent; color: red;" onclick="logout()">ODHLÁSIŤ</button>
-            </div>
-        </nav>
+    <h2>3. Klasická vs. Absurdná dráma</h2>
+    <div class="highlight">
+        <b>Dráma ako literárny druh:</b> Nemá rozprávača. Dej sa realizuje prostredníctvom dialógov a monológov postáv na scéne.
+    </div>
+    <p><b>Klasická dráma (Antigona):</b> Má prísnu kompozíciu (expozícia, kolízia, kríza, peripetia, katastrofa). Platí tu jednota času, miesta a deja (všetko na jednom mieste za jeden deň).<br>
+    <b>Absurdná dráma (Čakanie na Godota - Samuel Beckett):</b> Antidráma. Chýba súvislý dej, postavy sú pasívne, často nevieme, kto sú a odkiaľ prišli. Jazyk stráca komunikačnú funkciu (postavy sa rozprávajú, ale nepočúvajú sa). Čakajú na Godota (Boha, záchranu, zmysel), ktorý neprichádza.</p>
 
-        <header class="hero">
-            <video autoplay muted loop playsinline class="hero-video-bg">
-                <source src="https://www.pexels.com/download/video/5319760/" type="video/mp4">
-            </video>
+    <h2>4. Zobrazenie 1. sv. vojny v tvorbe slovenských autorov</h2>
+    <ul>
+        <li><b>Pavol Országh Hviezdoslav - Krvavé sonety:</b> Lyrická skladba (sonety = 14 veršov). Odsudzuje vojnu ako zločin proti ľudskosti. Kladie otázku, kto je za vojnu zodpovedný a hľadá vinu v sebectve. V závere verí v mier.</li>
+        <li><b>Milo Urban - Živý bič:</b> Unanimistický román (hlavným hrdinom nie je jednotlivec, ale kolektív - dedina Ráztoky). Román ukazuje, ako vojna (aj keď sa nedeje priamo v dedine) ničí ľudí, mravne ich rozkladá (Eva Hlavajová, notár Okolický) až kým sa dedina nevzbúri (živý bič = pomsta ľudu).</li>
+    </ul>
 
-            <div class="hero-text">
-                <h1 id="dynamic-title">Zmeň svoje telo,<br><span>zmeň svoj život</span></h1>
-                <p>Najúspešnejšia platforma pre naturálnu transformáciu na Slovensku. Pridaj sa k stovkám spokojných klientov.</p>
-                <a href="#ponuka" class="btn-cta">Pozrieť ponuku</a>
+    <h2>5. Tematická a žánrová rôznorodosť vo svetovej próze po 1945</h2>
+    <p>Odraz vojny, vplyv existencializmu a neorealizmu. Druhy rozprávača: <b>vševediaci</b> (3. osoba, vie všetko o postavách), <b>priamy / personálny</b> (1. osoba, subjektívny pohľad), <b>oko kamery</b> (nezaujatý, iba opisuje).</p>
+    <ul>
+        <li><b>Alberto Moravia - Rimanka (Neorealizmus):</b> Taliansko, snaha o dokumentárny pohľad na realitu zdola. Príbeh Adriany, z ktorej sa pre chudobu stane prostitútka. Zlyhanie spoločnosti.</li>
+        <li><b>Jean-Paul Sartre - Múr (Existencializmus):</b> Človek je hodený do sveta a je definovaný svojimi činmi. V poviedke Múr hrdina (Pablo) čaká na popravu, prežíva hraničnú situáciu a absurditu existencie.</li>
+        <li><b>Umberto Eco - Meno ruže (Postmoderna):</b> Historický román, detektívka a filozofický traktát v jednom. Dvojúrovňové čítanie. Vraždy v kláštore vyšetruje Viliam z Baskervillu.</li>
+        <li><b>J. D. Salinger - Kto chytá v žite:</b> Psychologický román. Holden Caulfield, rebelujúci tínedžer, uteká zo školy a blúdi New Yorkom. Kritika pokrytectva dospelých ("falše").</li>
+    </ul>
 
-                <div class="social-proof">
-                    <div class="user-avatars">
-                        <img src="https://i.pravatar.cc/100?u=1" alt="User">
-                        <img src="https://i.pravatar.cc/100?u=2" alt="User">
-                        <img src="https://i.pravatar.cc/100?u=3" alt="User">
-                    </div>
-                    <span>+ 482 ľudí dnes začalo trénovať</span>
-                </div>
-            </div>
-            <div id="side-tracker" class="side-panel">
-    <div class="side-handle" onclick="toggleTracker()">
-        <span>ENGINE PRO ⚡</span>
+    <h2>6. Novela a kritický realizmus</h2>
+    <div class="highlight">
+        <b>Novela:</b> Stredný epický útvar. Má zvyčajne jednu dejovú líniu, menší počet postáv, dej má rýchly spád a prekvapivý záver.<br>
+        <b>Horizontálne členenie:</b> Odseky, kapitoly, diely.
+    </div>
+    <ul>
+        <li><b>Božena Slančíková-Timrava - Ťapákovci:</b> Kritický realizmus. Ukazuje zaostalosť, lenivosť a lipnutie na tradíciách (ťapákovčina). Iľa-kráľovná chce zmenu, Anča-zmija je tragická postava (fyzicky postihnutá, citovo trpiaca).</li>
+        <li><b>B. S. Timrava - Bez hrdosti:</b> Téma nešťastnej, ponižujúcej lásky (Milina).</li>
+        <li><b>A. S. Puškin - Kapitánova dcéra:</b> Ruský romantizmus/realizmus. Príbeh Piotra Griniova a Máše počas Pugačovovho povstania.</li>
+    </ul>
+
+    <h2>7. Retrospektívny kompozičný postup</h2>
+    <p>Dej sa neodvíja chronologicky, ale hrdina spomína na minulosť zo súčasného bodu.</p>
+    <ul>
+        <li><b>Ladislav Mňačko - Ako chutí moc:</b> Retrospektíva. Novinár Frank na pohrebe svojho bývalého priateľa, mŕtveho politika (Mocného), spomína, ako peniaze a moc tohto človeka postupne zničili a skorumpovali.</li>
+        <li><b>Ladislav Mňačko - Smrť sa volá Engelchen:</b> Partizán Voloďa leží po vojne v nemocnici a spomína na vypálenie obce Ploština. Trpí pocitom viny, že partizáni dedinu neochránili. Marta, židovka, ktorá sa predávala Nemcom, aby získala informácie, trpí psychicky.</li>
+    </ul>
+
+    <h2>8. Naturizmus (Lyrická próza)</h2>
+    <p>Slovenský smer v medzivojnovom období. Rytmizovaná veta, baladickosť, rozprávkové motívy (dobro vs. zlo, magické čísla), vplyv prírody na človeka. Príroda je živá bytosť.</p>
+    <ul>
+        <li><b>Margita Figuli - Tri gaštanové kone:</b> Peter, Magdaléna, Jano Zápotočný. Súboj dobra (Peter) a zla (Jano, ktorý týra kone a Magdalénu). Kresťanská morálka.</li>
+        <li><b>Dobroslav Chrobák - Drak sa vracia:</b> Drak (Martin Lepiši) je outsider, obvinený zo všetkého zlého. Zachráni dedine dobytok z horiacich lesov, aby získal späť česť, ale Eva už má Šimona.</li>
+        <li><b>František Švantner - Stretnutie:</b> Typický naturizmus plný tajomna, smrti a animizovanej prírody.</li>
+    </ul>
+
+    <h2>9. Lyrika a umelecké jazykové prostriedky</h2>
+    <p><b>Lyrika:</b> Nemá dej, vyjadruje pocity, nálady, myšlienky. Druhy: osobná, prírodná, spoločenská, reflexívna (úvahová).</p>
+    <ul>
+        <li><b>Jazykové prostriedky:</b> Epiteton (básnický prívlastok), metafora (prenášanie významu na základe vonkajšej podobnosti), personifikácia (zosobnenie), prirovnanie, oxymoron.</li>
+        <li><b>Ján Botto - Smrť Jánošíkova:</b> Romantická básnická skladba. Lyrizovaný epos. Dôraz na Jánošíkovo uväznenie, smrť a víziu slobody.</li>
+        <li><b>Ján Smrek - Najčistejšia láska:</b> Vitalizmus. Oslava života, ženy, lásky. Senzuálnosť, optimizmus.</li>
+    </ul>
+
+    <h2>10. Staroslovienska kultúra a vzdelanosť</h2>
+    <p>Príchod Konštantína a Metoda na Veľkú Moravu (863). Priniesli písmo (hlaholika - z malej gréckej abecedy) a jazyk (staroslovienčina).<br>
+    <b>Literárne pamiatky:</b> Proglas (predspev k sv. evanjeliu, prvá báseň, oslavuje vzdelanosť a rodný jazyk).<br>
+    <b>Moravsko-panónske legendy:</b> Život sv. Konštantína (Kliment - viac filozofický, teologický) a Život sv. Metoda (Gorazd - vecnejší, viac faktov). Sú to hagiografie (životopisy svätých).</p>
+
+    <h2>11. Báj, bájka</h2>
+    <ul>
+        <li><b>Báj (Mýtus):</b> Pokus starovekého človeka vysvetliť vznik sveta, prírodné javy. Vystupujú bohovia a polobohovia (Prometeus).</li>
+        <li><b>Bájka:</b> Krátky epický útvar. Zvieratá alebo veci konajú a hovoria ako ľudia (personifikácia, alegória/inotaj). Cieľom je ponaučenie na konci (alebo na začiatku). (Ezop, La Fontaine, Záborský).</li>
+    </ul>
+
+    <h2>12. Antika a antická literatúra</h2>
+    <p><b>Princípy gréckej drámy:</b> Hrali iba muži (aj ženské roly), amfiteátre, masky. Jednota miesta, času a deja. Prítomný chór (zbor), ktorý komentuje dej a radí postavám.<br>
+    <b>Homér - Ilias a Odysea:</b> Ilias = epos o Trójskej vojne (Achilles vs. Hektor). Odysea = epos o návrate Odysea domov na Ithaku.<br>
+    <b>Sofokles - Antigona:</b> Tragédia. Antigona chce pochovať brata (Polynika) podľa božských zákonov napriek zákazu kráľa Kreonta (ľudský zákon). Antigona zomiera, Kreon prichádza o celú rodinu (trest za pýchu).</p>
+
+    <h2>13. Ľudová slovesnosť a romantizmus (Štúrovci)</h2>
+    <p>Ústne tradovaná tvorba (piesne, rozprávky, porekadlá). Pre štúrovcov (romantizmus) to bol hlavný zdroj inšpirácie a rytmu (sylabický verš - rovnaký počet slabík).</p>
+    <ul>
+        <li><b>Samo Chalupka - Mor ho!:</b> Hrdinský spev. Slovanská družina bojuje proti obrovskej presile rímskeho cisára (symbol útlaku). Radšej zomrú, akoby mali žiť v otroctve.</li>
+        <li><b>Janko Kráľ - Zakliata panna vo Váhu a divný Janko:</b> Typický romantický hrdina (titanský, osamelý, zmietaný rozpormi). Janko chce zachrániť pannu, ale zabudne si prevrátiť odev (poruší magickú podmienku) a utopí sa v rieke.</li>
+    </ul>
+
+    <h2>14. Baroková literatúra</h2>
+    <p>Znaky: Pesimizmus, "Vanitas vanitatum" (Márnosť nad márnosť), kontrast (Boh vs. svet, duša vs. telo). Návrat k viere kvôli vojnám a morovým epidémiám.</p>
+    <ul>
+        <li><b>Hugolín Gavlovič - Valaská škola mravúv stodola:</b> Didaktická zbierka napísaná v slovakizovanej češtine. Rady pre bežný život, oslavuje prácu, odsudzuje opilstvo a pýchu.</li>
+        <li><b>Matej Bel:</b> Polyhistor ("Veľká ozdoba Uhorska"). Dielo Notitia... (Historicko-zemepisný poznatok o súvekom Uhorsku).</li>
+    </ul>
+
+    <h2>15. Staroveká orientálna literatúra</h2>
+    <ul>
+        <li><b>Epos o Gilgamešovi:</b> Sumersko-babylonský hrdinský epos. Gilgameš, kráľ Uruku (2/3 boh, 1/3 človek) po smrti priateľa Enkidua hľadá tajomstvo nesmrteľnosti. Zistí, že človek je nesmrteľný iba cez svoje činy (postavil hradby).</li>
+        <li><b>Biblia:</b> Starý zákon (Tóra, Žalmy, Proroci - pre Židov aj Kresťanov), Nový zákon (4 evanjeliá, Skutky, Listy, Apokalypsa - pre Kresťanov).</li>
+    </ul>
+
+    <h2>16. Slovenská moderná dráma (zač. 20. stor.)</h2>
+    <p>Realizmus, prienik sociálnych a psychologických tém do divadla.<br>
+    <b>Vonkajšie členenie:</b> Dejstvá, scény (zmena ľudí), obrazy (zmena prostredia).<br>
+    <b>Vnútorná stavba:</b> Úvod, zápletka, vyvrcholenie, obrat, rozuzlenie.</p>
+    <ul>
+        <li><b>Ivan Stodola - Bačova žena:</b> Sociálno-psychologická tragédia. Ondrej sa vráti z Ameriky domov, no jeho žena Eva je už vydatá za Miša, lebo si myslela, že Ondrej je mŕtvy. Neriešiteľný konflikt. Eva nakoniec spácha samovraždu, aby sa muži nebili o jej srdce a deti.</li>
+        <li><b>Július Barč-Ivan - Matka:</b> Expresionizmus. Matka má dar predvídať tragédiu. Vidí, že Jano chce zabiť svojho brata Paľa. Oblečie si Paľove šaty a obetuje svoj život, aby bratov zachránila od bratovraždy.</li>
+    </ul>
+
+    <h2>17. Pop-poézia</h2>
+    <p>Poézia určená na zhudobnenie. Dôraz na refrén, melódiu, rytmus a zrozumiteľný odkaz.</p>
+    <ul>
+        <li><b>Kamil Peteraj a Boris Filan:</b> Textári pre Prúdy, Elán, Modus.</li>
+        <li><b>Miroslav Válek - Jesenná láska:</b> Pôvodne hlboká báseň o pominuteľnosti lásky (zhudobnil Miro Žbirka).</li>
+        <li><b>Jozef Urban - Voda, čo ma drží nad vodou:</b> Emotívna pop-poézia o osudovej láske (Elán).</li>
+    </ul>
+
+    <h2>18. Realizmus (svetový a slovenský)</h2>
+    <p>Objektívne zobrazenie reality, typická postava v typickom prostredí.</p>
+    <ul>
+        <li><b>Sociálny a psychologický román:</b> Skúma vnútro postavy ovplyvnenej spoločnosťou.</li>
+        <li><b>H. de Balzac - Otec Goriot:</b> Prehnaná otcovská láska. Dcéry (Rastignac je mladý študent, ktorý vidí pád spoločnosti) ho využijú o peniaze a nechajú ho zomrieť samého.</li>
+        <li><b>L. N. Tolstoj - Anna Karenina:</b> Psychologický román. Anna podvedie manžela s Vronským. Spoločnosť ju odsúdi, nakoniec skočí pod vlak.</li>
+        <li><b>F. M. Dostojevskij - Zločin a trest:</b> Raskoľnikov zabije úžerníčku, lebo si myslí, že ako "výnimočný človek" má na to právo. Svedomie a Soňa ho prinútia sa priznať.</li>
+        <li><b>Martin Kukučín - Dom v stráni:</b> Slovenský realizmus z Dalmácie. Láska sedliaka (Niko) a zemanovho dievčaťa (Katica) stroskotá na triednych rozdieloch.</li>
+        <li><b>František Hečko - Červené víno:</b> Generačný román o vinohradníckej rodine Habdžovcov (Marek Habdža).</li>
+    </ul>
+
+    <h2>19. Epický žáner poviedka</h2>
+    <div class="highlight">
+        <b>Poviedka:</b> Krátky epický útvar s jednou dejovou líniou a málo postavami.
+    </div>
+    <ul>
+        <li><b>M. Kukučín - Keď báčik z Chochoľova umrie:</b> Ironický pohľad na upadajúce zemianstvo (Aduš Domanický - navonok pyšný, vnútri chudobný a prázdny) a dravých podnikateľov (Ondrej Tráva).</li>
+        <li><b>Jozef Gregor Tajovský - Maco Mlieč:</b> Sociálna poviedka s prvkami kritického realizmu. Maco je zdeformovaný sluha, ktorý drie pre gazdu zadarmo. Zaujíma ho len to, či má u gazdu dlh pred smrťou. Odhalenie krutosti vykorisťovania.</li>
+    </ul>
+
+    <h2>20. Obraz spoločnosti (Slovenská próza po 1945)</h2>
+    <p>Postupne sa uvoľňuje cenzúra, prichádzajú inovatívne <b>kompozičné postupy</b> (prúd autorovho vedomia, striedanie časov, postmoderna - koláž, asociácie).</p>
+    <ul>
+        <li><b>Alfonz Bednár - Kolíska:</b> Novela. Búra mýtus o bezchybnom SNP. Odohráva sa v 50. rokoch na súde, ale cez retrospektívu sa vraciame do Povstania. Ukazuje, že ľudia neboli len čierno-bieli hrdinovia/zradcovia.</li>
+        <li><b>Peter Jaroš - Tisícročná včela:</b> Magický realizmus na Slovensku. Rodina Pichandovcov. Včela je symbolom usilovnosti a nesmrteľnosti slovenského národa.</li>
+        <li><b>Dušan Mitana - Pohreb D. Krakowera:</b> Prvky postmoderny, absurdity a tajomna.</li>
+    </ul>
+
+    <h2>21. Humanizmus a Renesancia</h2>
+    <p><b>Znaky:</b> Znovuzrodenie antiky, stredobodom je človek (antropocentrizmus) a pozemský život, nie Boh. Vznik nových žánrov (sonet, novela).</p>
+    <ul>
+        <li><b>William Shakespeare - Hamlet:</b> Renesančná tragédia. Dánsky princ hľadá pravdu o vražde svojho otca (zabil ho strýko Claudius). "Byť či nebyť." Váhavosť, túžba po spravodlivosti, nakoniec zomierajú takmer všetci.</li>
+        <li><b>Miguel de Cervantes - Dômyselný rytier Don Quijote:</b> Paródia na rytierske romány. Quijote je blázon, ktorý bojuje s veternými mlynmi, po boku má praktického sluhu Sancha Panzu.</li>
+    </ul>
+
+    <h2>22. Svetový klasicizmus</h2>
+    <p><b>Žánre:</b> Vysoké (tragédia, óda) a nízke (komédia, satira, bájka). Typická vlastnosť postáv - vždy reprezentujú len jednu charakterovú vlastnosť.</p>
+    <ul>
+        <li><b>Molière - Lakomec:</b> Komédia. Harpagon je posadnutý peniazmi. Pre peniaze chce predať vlastné deti, jeho jediná láska je truhlička. Charakterový typ: absolútny lakomec.</li>
+    </ul>
+
+    <h2>23. Stratená generácia</h2>
+    <p>Autori poznačení prvou svetovou vojnou. Nevedeli sa zaradiť späť do bežného života, cítili apatiu a stratu hodnôt.</p>
+    <ul>
+        <li><b>Erich Maria Remarque - Na západe nič nové:</b> Nemecká literatúra. Paul Bäumer a jeho spolužiaci odchádzajú plní ideálov na front, kde zažívajú hrôzy, smrť priateľov a zničenie vlastnej psychiky.</li>
+        <li><b>Romain Rolland - Peter a Lucia (Pacifizmus - Francúzsko):</b> Krátka novela o čistej láske v tieni vojny v Paríži. Obaja umierajú pod troskami kostola pri bombardovaní (láska vs. smrť).</li>
+    </ul>
+
+    <h2>24. Stredoveká literatúra</h2>
+    <p>Zameraná na Boha (teocentrizmus), mysticizmus. Autor bol anonymný (dôležité bolo dielo, nie on).<br>
+    <b>Motívy:</b> Náboženské (askéza, utrpenie). <b>Žánre:</b> Legenda (život svätého), exemplum (krátky príbeh s ponaučením do kázne), kronika (historické zápisy), hrdinský epos (Pieseň o Rolandovi), rytiersky epos, ľúbostná poézia (trubadúri).</p>
+
+    <h2>25. Fantasy a Sci-fi literatúra</h2>
+    <div class="highlight">
+        <b>Rozdiel:</b><br>
+        <b>Sci-fi (Vedecká fantastika):</b> Dej je postavený na vedeckých poznatkoch, technológiách budúcnosti a vesmíre. (Pojem "robot" použil Josef Čapek, preslávil ho Karel Čapek v dráme R.U.R.)<br>
+        <b>Fantasy:</b> Základom je mágia, mytológia, neexistujúce svety (elfovia, trpaslíci). Pravidlá vedy tu neplatia. (Tolkien - Pán prsteňov).
     </div>
 
-    <div class="side-header">
-        <h2 style="margin:0;">WORKOUT <span style="color:var(--primary);">LOG</span></h2>
-        <div class="stats-row">
-            <div class="mini-stat">Objem <span id="total-vol">0 kg</span></div>
-            <div class="mini-stat">Série <span id="total-s">0</span></div>
-            <div class="mini-stat">Čas <span id="timer">0:00</span></div>
-        </div>
+    <h2>26. Zmierenie alebo Dobrodružstvo pri obžinkoch / Statky-zmätky</h2>
+    <ul>
+        <li><b>Ján Palárik - Zmierenie... :</b> Veselohra. Konflikt je postavený na zámene osôb (grófka sa vymení so spoločníčkou, barón so svojím priateľom). Propaguje zmierenie šľachty a ľudu, a toleranciu k slovenskému národu.</li>
+        <li><b>J. G. Tajovský - Statky-zmätky:</b> Kritický realizmus. Konflikt majetkový (Palčíkovci chcú lacnú pracovnú silu, Ľavkovci peniaze, Ďuro a Zuzka sa pre majetok zoberú, ale skončí to rozvodom). Téma: Majetok ničí ľudské vzťahy.</li>
+        <li><b>Pojmy:</b> Inscenácia (uvedenie hry na javisko), herec, režisér (vedie nácvik), scenár (text), scénické poznámky (text v zátvorkách pre hercov, ako sa hýbať/tváriť).</li>
+    </ul>
+
+    <h2>27. Milan Rúfus vs. Miroslav Válek</h2>
+    <p>Dve veľké postavy slovenskej poézie 20. storočia.</p>
+    <ul>
+        <li><b>Milan Rúfus:</b> Tichý, reflexívny básnik. Čerpá z kresťanstva, tradícií a rozprávok (Až dozrieme, Zvony). Kladie dôraz na pokoru, prácu, domov a matku.</li>
+        <li><b>Miroslav Válek:</b> Intelektuálny, moderný, často politicky angažovaný. Komplikovanejšia metafora, voľný verš (Dotyky, Milovanie v husej koži). Často rozoberá krízu identity a pocit odcudzenia.</li>
+    </ul>
+
+    <h2>28. Slovenská medzivojnová literatúra</h2>
+    <p>Po vzniku ČSR (1918) nastal rozvoj. Smery: Realizmus prežíva, vzniká naturizmus, ľavicová avantgarda, katolícka moderna (poézia spojená s náboženstvom, R. Dilong).</p>
+    <ul>
+        <li><b>Jozef Cíger Hronský - Jozef Mak:</b> Román. "Človek milión". Mak je pasívny hrdina, trpí rany osudu (chudoba, nevlastný brat mu zoberie dom aj snúbenicu), no prijíma ich s údelom pracujúceho človeka. Fatalizmus.</li>
+        <li><b>J. G. Tajovský (?) - Mladý svadobník:</b> (Pozn.: V osnovách tu skôr býva Ľudo Ondrejov alebo J. C. Hronský a iné diela. Ak myslíte Hronského dielo alebo špecifickú poviedku, zamerajte sa na dedinský život a jeho strasti.)</li>
+    </ul>
+
+    <h2>29. Téma lásky</h2>
+    <ul>
+        <li><b>Andrej Sládkovič - Marína:</b> Romantická báseň. Spája lásku k žene a lásku k vlasti ("Vlasť drahú ľúbiť v peknej Maríne").</li>
+        <li><b>Ján Kostra - Ave Eva:</b> Oslava ženy, lásky a materstva (vitalizmus/surrealizmus).</li>
+        <li><b>Rudolf Jašík - Námestie svätej Alžbety:</b> Príbeh tragickej lásky chudobného Igora a židovky Evy počas Holokaustu (vojnová línia). Evu nakoniec zastrelia nemeckí vojaci.</li>
+    </ul>
+
+    <h2>30. Detektívna a hororová literatúra</h2>
+    <p><b>Detektívka:</b> Základom je zločin a vyšetrovateľ (detektív - má mimoriadne analytické schopnosti, napr. Sherlock Holmes od A. C. Doyla). Typické postavy: detektív, jeho asistent (dr. Watson), páchateľ, falošné stopy.<br>
+    <b>Horor:</b> Cieľom je vyvolať u čitateľa strach a napätie. Typické motívy: smrť, duchovia, opustené domy, tma. Atmosféra je ponurá, strašidelná (E. A. Poe - Havran, Jáma a kyvadlo). V horore často ide o prežitie, kým v detektívke o vyriešenie intelektuálnej hádanky.</p>
+
+    <div class="page-break"></div>
+
+    <h1>2. Časť: Slovenský jazyk - Gramatika a štylistika</h1>
+    <p>Na ústnej maturite musíte analyzovať aj priložený text z jazykového hľadiska. Tu je prehľad toho najdôležitejšieho:</p>
+
+    <div class="grammar-box">
+        <h2>A. Hláskoslovie (Fonetika)</h2>
+        <ul>
+            <li><b>Samohlásky:</b> krátke (a, e, i, o, u, y), dlhé (á, é, í, ó, ú, ý).</li>
+            <li><b>Spoluhlásky:</b> 
+                <br> Tvrdé (h, ch, k, g, d, t, n, l) - píše sa po nich y.
+                <br> Mäkké (c, dz, j, ď, ť, ň, ľ, š, č, ž, dž) - píše sa po nich i.
+                <br> Obojaké (b, m, p, r, s, v, z, f) - vybrané slová.
+            </li>
+            <li><b>Spodobovanie znelosti:</b> Znelá spoluhláska pred neznelou sa vysloví ako neznelá (napr. <i>dub padol</i> -> [dup padol]) a naopak.</li>
+        </ul>
     </div>
 
-    <div class="part-tabs">
-        <button class="tab-btn" onclick="showExercises('Prsia')">PRSIA</button>
-        <button class="tab-btn" onclick="showExercises('Chrbát')">CHRBÁT</button>
-        <button class="tab-btn" onclick="showExercises('Nohy')">NOHY</button>
-        <button class="tab-btn" onclick="showExercises('Ramená')">RAMENÁ</button>
-        <button class="tab-btn" onclick="showExercises('Ruky')">RUKY</button>
+    <div class="grammar-box">
+        <h2>B. Morfológia (Slovné druhy)</h2>
+        <ul>
+            <li><b>Ohybné (časujú sa alebo skloňujú):</b> 1. Podstatné mená, 2. Prídavné mená, 3. Zámená, 4. Číslovky, 5. Slovesá (majú gram. kategórie: osoba, číslo, čas, spôsob, vid).</li>
+            <li><b>Neohybné:</b> 6. Príslovky, 7. Predložky (viažu sa na pád), 8. Spojky (priraďovacie a podraďovacie), 9. Častice (vyjadrujú postoj, napr. <i>asi, veru, bodaj</i>), 10. Citoslovcia.</li>
+        </ul>
     </div>
 
-    <div id="exercise-picker" style="padding: 0 30px 10px 30px; display:none; flex-wrap: wrap; gap: 5px;"></div>
-
-    <div id="workout-content" style="flex-grow:1; overflow-y:auto; padding-top: 10px;">
-        <p id="empty-msg" style="text-align:center; color:#444; margin-top:50px;">Zatiaľ žiadne cviky. Vyber partiu hore!</p>
+    <div class="grammar-box">
+        <h2>C. Syntax (Skladba)</h2>
+        <ul>
+            <li><b>Vetné členy:</b> Podmet (Kto? Čo?), Prísudok (Čo robí? Čo sa s ním deje?), Predmet (pády okrem nominatívu), Prívlastok (Aky? Ktorý? Čí? - zhodný/nezhodný), Príslovkové určenie (miesta, času, spôsobu, príčiny).</li>
+            <li><b>Druhy viet podľa zloženia:</b> 
+                <br>- <i>Jednoduchá veta</i> (jeden prísudok)
+                <br>- <i>Súvetie</i> (priraďovacie = dve rovnocenné vety; podraďovacie = hlavná a vedľajšia veta - "pýtam sa hlavnou, odpovedám vedľajšou").
+            </li>
+        </ul>
     </div>
 
-    <div style="padding:25px; border-top: 1px solid rgba(255,255,255,0.05);">
-        <button onclick="finishWorkout()" class="btn" style="width:100%; border-radius:12px;">DOKONČIŤ TRÉNING</button>
-    </div>
-</div>
-</div>
-        </header>
-
-        <div class="trust-bar">
-            <div class="trust-item"><span>✔</span> Garancia vrátenia peňazí</div>
-            <div class="trust-item"><span>★</span> 5000+ Spokojných klientov</div>
-            <div class="trust-item"><span>🔒</span> Bezpečná platba SSL</div>
-            <div class="trust-item"><span>⚡</span> Okamžitý prístup</div>
-        </div>
-<section id="bmi" style="padding: 40px 5%; width: 100%;">
-    <div class="bmi-card" style="display: flex; flex-direction: column; width: 100%; max-width: 1600px; margin: 0 auto; padding: 35px 50px; border: 1px solid #222; background: #080808; border-radius: 25px; box-shadow: 0 20px 50px rgba(0,0,0,0.3);">
-        
-        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 35px; border-bottom: 1px solid #1a1a1a; padding-bottom: 25px;">
-            <div>
-                <h2 style="font-weight: 900; letter-spacing: -2px; font-size: 2rem; margin: 0;">FIT-PRO <span style="color: var(--primary);">DIAGNOSTIKA</span></h2>
-                <div id="save-status" style="font-size: 0.65rem; color: var(--success); margin-top: 5px; opacity: 0; transition: 0.3s;">● ÚDAJE SYNCHRONIZOVANÉ S PROFILOM</div>
-            </div>
-            
-            <div style="display: flex; background: #000; padding: 6px; border-radius: 12px; border: 1px solid #333;">
-                <button id="btn-bmi-mode" class="tab-btn active" onclick="setCalcMode('bmi')" style="font-size: 0.75rem; padding: 10px 25px;">BMI INDEX</button>
-                <button id="btn-fat-mode" class="tab-btn" onclick="setCalcMode('fat')" style="font-size: 0.75rem; padding: 10px 25px;">BODY FAT %</button>
-            </div>
-        </div>
-
-        <div style="display: grid; grid-template-columns: 1fr 1.2fr 1.5fr; gap: 50px; align-items: start;">
-            
-            <div style="background: #000; padding: 25px; border-radius: 20px; border: 1px solid #1a1a1a;">
-                <label style="font-size: 0.65rem; color: var(--primary); font-weight: 900; letter-spacing: 1px; display: block; margin-bottom: 15px; text-transform: uppercase;">Základné biometrické údaje</label>
-                
-                <div style="display: grid; gap: 15px;">
-                    <div style="position: relative;">
-                        <span style="position: absolute; right: 15px; top: 15px; color: #444; font-size: 0.8rem;">cm</span>
-                        <input type="number" id="height" placeholder="Výška" oninput="calculateAndSave()" style="padding: 15px; background: #0a0a0a; border: 1px solid #222; border-radius: 10px; width: 100%; color: #fff;">
-                    </div>
-                    <div style="position: relative;">
-                        <span style="position: absolute; right: 15px; top: 15px; color: #444; font-size: 0.8rem;">kg</span>
-                        <input type="number" id="weight" placeholder="Váha" oninput="calculateAndSave()" style="padding: 15px; background: #0a0a0a; border: 1px solid #222; border-radius: 10px; width: 100%; color: #fff;">
-                    </div>
-                    
-                    <div id="fat-extra-inputs" style="display: none; gap: 15px; grid-template-columns: 1fr 1fr;">
-                        <input type="number" id="neck" placeholder="Krk" oninput="calculateAndSave()" style="padding: 15px; background: #0a0a0a; border: 1px solid #222; border-radius: 10px; width: 100%; color: #fff;">
-                        <input type="number" id="waist" placeholder="Pás" oninput="calculateAndSave()" style="padding: 15px; background: #0a0a0a; border: 1px solid #222; border-radius: 10px; width: 100%; color: #fff;">
-                    </div>
-                </div>
-            </div>
-
-            <div style="text-align: center; padding: 10px 0;">
-                <div id="res-bmi">
-                    <span id="bmi-val" style="font-size: 6rem; font-weight: 900; color: #fff; line-height: 0.9; letter-spacing: -4px;">0.0</span>
-                    <div id="bmi-status" style="margin-top: 15px; font-weight: 900; color: var(--primary); font-size: 0.9rem; letter-spacing: 2px;">ZADAJTE ÚDAJE</div>
-                    <div class="bmi-scale" style="height: 6px; background: #1a1a1a; border-radius: 3px; margin-top: 25px; position: relative;">
-                        <div id="bmi-pointer" style="width: 4px; height: 18px; background: #fff; position: absolute; top: -6px; border-radius: 2px; transition: 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);"></div>
-                    </div>
-                </div>
-                
-                <div id="res-fat" style="display: none;">
-                    <span id="fat-val" style="font-size: 6rem; font-weight: 900; color: var(--primary); line-height: 0.9; letter-spacing: -4px;">0%</span>
-                    <div style="margin-top: 15px; font-weight: 900; color: #fff; font-size: 0.9rem; letter-spacing: 2px;">BODY FAT ESTIMATE</div>
-                </div>
-            </div>
-
-            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px;">
-                <div style="background: #111; padding: 15px; border-radius: 12px; border: 1px solid #1a1a1a;">
-                    <small style="color: #444; font-size: 0.6rem; font-weight: 900; display: block; margin-bottom: 5px;">DENNÝ VÝDAJ (BMR)</small>
-                    <b id="bmr-val" style="font-size: 1.1rem; color: #fff;">0</b> <span style="font-size: 0.7rem; color: #444;">kcal</span>
-                </div>
-                <div style="background: #111; padding: 15px; border-radius: 12px; border: 1px solid #1a1a1a;">
-                    <small style="color: #444; font-size: 0.6rem; font-weight: 900; display: block; margin-bottom: 5px;">IDEÁLNA VÁHA</small>
-                    <b id="ideal-weight" style="font-size: 1.1rem; color: var(--success);">0</b> <span style="font-size: 0.7rem; color: #444;">kg</span>
-                </div>
-                <div style="background: #111; padding: 15px; border-radius: 12px; border: 1px solid #1a1a1a;">
-                    <small style="color: #444; font-size: 0.6rem; font-weight: 900; display: block; margin-bottom: 5px;">VODA V TELE</small>
-                    <b id="water-val" style="font-size: 1.1rem; color: #00ccff;">0</b> <span style="font-size: 0.7rem; color: #444;">L</span>
-                </div>
-                <div style="background: #111; padding: 15px; border-radius: 12px; border: 1px solid #1a1a1a;">
-                    <small style="color: #444; font-size: 0.6rem; font-weight: 900; display: block; margin-bottom: 5px;">POVRCH TELA (BSA)</small>
-                    <b id="bsa-val" style="font-size: 1.1rem; color: #ffcc00;">0</b> <span style="font-size: 0.7rem; color: #444;">m²</span>
-                </div>
-                <div style="grid-column: span 2; background: rgba(255,77,0,0.05); padding: 15px; border-radius: 12px; border: 1px dashed #333; text-align: center;">
-                     <span style="font-size: 0.7rem; color: var(--text-dim);">RIZIKO OCHORENÍ: </span>
-                     <b id="risk-level" style="font-size: 0.7rem; color: #fff; text-transform: uppercase;">Nízke</b>
-                </div>
-            </div>
-        </div>
-    </div>
-</section>
-    </div>
-</section>
-        <section id="plans" style="padding: 60px 5%; width: 100%; max-width: 1600px; margin: 0 auto;">
-    <h2 style="font-weight: 900; letter-spacing: -2px; font-size: 2.5rem; margin-bottom: 40px; text-align: left;">
-        TRÉNINGOVÉ <span style="color: var(--primary);">PLÁNY</span>
-    </h2>
-
-    <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 30px;">
-        
-        <div class="plan-card" style="background: #0f0f0f; border: 1px solid #222; padding: 40px; border-radius: 25px; transition: 0.3s; position: relative; overflow: hidden;">
-            <div style="position: absolute; top: 0; right: 0; background: var(--primary); color: #fff; padding: 5px 20px; font-size: 0.7rem; font-weight: 900; transform: rotate(0deg);">BESTSELLER</div>
-            <h3 style="font-size: 1.8rem; font-weight: 900; margin-bottom: 10px;">Objemový Kráľ</h3>
-            <p style="color: var(--text-dim); font-size: 0.9rem; margin-bottom: 25px;">Maximálny nárast svalovej hmoty a sily. Overená metodika pre naturálov.</p>
-            <div style="font-size: 2.5rem; font-weight: 900; margin-bottom: 30px;">49€</div>
-            <button class="btn-cta" onclick="addToCart('Objemový Kráľ', 49)" style="width: 100%; padding: 18px; border-radius: 12px; font-size: 0.9rem;">DO KOŠÍKA</button>
-        </div>
-
-        <div class="plan-card" style="background: #0f0f0f; border: 1px solid #222; padding: 40px; border-radius: 25px; transition: 0.3s;">
-            <h3 style="font-size: 1.8rem; font-weight: 900; margin-bottom: 10px;">Rysovacia Biblia</h3>
-            <p style="color: var(--text-dim); font-size: 0.9rem; margin-bottom: 25px;">Extrémne spaľovanie tuku bez straty svalov. Detailný jedálniček v cene.</p>
-            <div style="font-size: 2.5rem; font-weight: 900; margin-bottom: 30px;">39€</div>
-            <button class="btn-cta" onclick="addToCart('Rysovacia Biblia', 39)" style="width: 100%; padding: 18px; border-radius: 12px; font-size: 0.9rem;">DO KOŠÍKA</button>
-        </div>
-
-        <div class="plan-card" style="background: #0f0f0f; border: 1px solid #222; padding: 40px; border-radius: 25px; transition: 0.3s;">
-            <h3 style="font-size: 1.8rem; font-weight: 900; margin-bottom: 10px;">Domáci Warrior</h3>
-            <p style="color: var(--text-dim); font-size: 0.9rem; margin-bottom: 25px;">Tréning s vlastnou váhou a pomôckami. Výsledky priamo z obývačky.</p>
-            <div style="font-size: 2.5rem; font-weight: 900; margin-bottom: 30px;">29€</div>
-            <button class="btn-cta" onclick="addToCart('Domáci Warrior', 29)" style="width: 100%; padding: 18px; border-radius: 12px; font-size: 0.9rem;">DO KOŠÍKA</button>
-        </div>
-
-    </div>
-</section>
-
-<style>
-    /* LIGHT MODE DEFINÍCIA */
-body.light-mode {
-    --bg: #f5f5f5;
-    --text: #050505;
-    --card-bg: #ffffff;
-    --text-dim: #555;
-}
-
-body.light-mode .bmi-card, 
-body.light-mode .plan-card,
-body.light-mode nav {
-    background: #ffffff !important;
-    border-color: #ddd !important;
-    box-shadow: 0 10px 30px rgba(0,0,0,0.05) !important;
-}
-
-body.light-mode input, 
-body.light-mode select {
-    background: #eee !important;
-    color: #000 !important;
-    border-color: #ccc !important;
-}
-
-/* ŠTÝL PRE TLAČIDLO PREPÍNAČA */
-.theme-switch {
-    cursor: pointer;
-    padding: 10px;
-    border-radius: 50%;
-    background: #111;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    transition: 0.3s;
-    border: 1px solid #333;
-    width: 40px;
-    height: 40px;
-}
-
-body.light-mode .theme-switch {
-    background: #eee;
-    border-color: #ccc;
-}
-    .plan-card:hover {
-        border-color: var(--primary) !important;
-        transform: translateY(-10px);
-        box-shadow: 0 20px 40px rgba(255, 77, 0, 0.1);
-    }
-/* --- BEFORE & AFTER SLIDER --- */
-.transformation-section {
-    padding: 60px 10%;
-    text-align: center;
-    background: #080808;
-}
-
-.ba-container {
-    position: relative;
-    width: 100%;
-    max-width: 600px;
-    height: 400px;
-    margin: 0 auto;
-    border: 2px solid var(--primary);
-    border-radius: 20px;
-    overflow: hidden;
-    box-shadow: 0 0 30px rgba(255, 77, 0, 0.2);
-}
-
-.ba-img-container {
-    position: absolute;
-    top: 0; left: 0; width: 100%; height: 100%;
-    overflow: hidden;
-}
-
-.ba-img-container img {
-    width: 100%; height: 100%;
-    object-fit: cover;
-    object-position: left; /* Dôležité pre zarovnanie */
-}
-
-/* Modifikovaný (vrchný) obrázok sa bude orezávať */
-.ba-img-container.modified {
-    width: 50%; /* Začína na 50% */
-    border-right: 2px solid white;
-    z-index: 2;
-}
-
-/* Štýl pre posuvník (input range) - robíme ho neviditeľným, ale funkčným cez celú šírku */
-.ba-slider {
-    position: absolute;
-    top: 0; left: 0; width: 100%; height: 100%;
-    z-index: 10;
-    opacity: 0;
-    cursor: e-resize;
-    margin: 0;
-}
-
-/* Vizuálna čiara a tlačidlo */
-.ba-line {
-    position: absolute;
-    top: 0; bottom: 0; left: 50%;
-    width: 2px;
-    background: #fff;
-    z-index: 5;
-    pointer-events: none; /* Aby neblokovala kliknutia */
-}
-
-.ba-button {
-    position: absolute;
-    top: 50%; left: 50%;
-    transform: translate(-50%, -50%);
-    width: 40px; height: 40px;
-    background: var(--primary);
-    color: white;
-    border-radius: 50%;
-    display: flex; align-items: center; justify-content: center;
-    font-weight: bold;
-    z-index: 6;
-    box-shadow: 0 0 10px rgba(0,0,0,0.5);
-    pointer-events: none;
-}
-</style>
-<section class="transformation-section">
-    <h2 class="section-title">SKUTOČNÉ <span>VÝSLEDKY</span></h2>
-    
-    <div class="ba-container">
-        <div class="ba-img-container modified">
-            <img src="https://images.unsplash.com/photo-1571019614242-c5c5dee9f50b?ixlib=rb-1.2.1&auto=format&fit=crop&w=800&q=80" alt="After">
-        </div>
-        
-        <div class="ba-img-container">
-            <img src="https://images.unsplash.com/photo-1583454110551-21f2fa2afe61?ixlib=rb-1.2.1&auto=format&fit=crop&w=800&q=80" alt="Before">
-        </div>
-        
-        <input type="range" min="0" max="100" value="50" class="ba-slider" oninput="slideCompare(this)">
-        <div class="ba-line"></div>
-        <div class="ba-button">↔</div>
-    </div>
-    
-    <p style="text-align: center; margin-top: 20px; color: var(--text-dim);">
-        Marek (24 r.) - Výsledok po 3 mesiacoch programu <b>Objemový Kráľ</b>
-    </p>
-</section>
-        </section>
-
-        <div class="newsletter-footer">
-            <div class="newsletter-text">
-                <h2>Tréningy & Rady Zdarma</h2>
-                <p>Budeme ti posielať najnovšie plány, videá a expertné návody.</p>
-            </div>
-            <div class="newsletter-form">
-                <input type="email" placeholder="Emailová adresa">
-                <button onclick="alert('Ďakujeme za odber!')">Odoberať</button>
-            </div>
-        </div>
-
-        <footer class="footer-main">
-            <div class="footer-col">
-                <div class="logo">FIT<span>PROGRESS</span></div>
-                <p style="font-size: 0.8rem; margin-top: 15px; color: rgba(255,255,255,0.6);">Sme tvoj partner na ceste za lepším ja. Kvalitné plány podložené vedou.</p>
-            </div>
-            <div class="footer-col">
-                <h4>Zákaznícky servis</h4>
-                <ul>
-                    <li><a href="javascript:void(0)" onclick="openHelpModal()">Centrum pomoci</a></li>
-                    <li><a href="javascript:void(0)" onclick="openOrderModal()">Sledovať objednávku</a></li>
-                </ul>
-            </div>
-            <div class="footer-col">
-                <h4>O nás</h4>
-                <ul>
-                    <li><a href="javascript:void(0)" onclick="openStoryModal()">Náš príbeh</a></li>
-                    <li><a href="#">Kariéra</a></li>
-                </ul>
-            </div>
-            <div class="footer-col">
-                <h4>Spolupráca</h4>
-                <ul>
-                    <li><a href="#">Affiliate program</a></li>
-                </ul>
-            </div>
-        </footer>
-
-        <div class="footer-bottom">
-            &copy; 2006-2026 FitProgress, LLC. Všetky práva vyhradené. | Ochrana údajov | Podmienky používania
-        </div>
+    <div class="grammar-box">
+        <h2>D. Lexikológia (Slovná zásoba)</h2>
+        <ul>
+            <li><b>Slovo:</b> má vecný a gramatický význam.</li>
+            <li><b>Delenie slov podľa významu:</b> Synonymá (rôzne slová, rovnaký význam), Antonymá (opozitá), Homonymá (rovnako znejú, rôzny význam - napr. <i>čelo</i>).</li>
+            <li><b>Obohacovanie slovnej zásoby:</b> Odvodzovanie (predpona, prípona), skladanie (autobus), skracovanie (SND), preberanie z cudzích jazykov (softvér).</li>
+            <li><b>Štýlové rozvrstvenie:</b> Neutrálne vs. zafarbené slová (historizmy, archaizmy, neologizmy, slang, argot, dialektizmy).</li>
+        </ul>
     </div>
 
-    <div id="cart-modal" class="modal">
-        <div class="modal-content">
-            <h2 style="color: var(--primary);">TVOJ KOŠÍK</h2>
-            <div id="cart-items" style="margin: 20px 0; max-height: 250px; overflow-y: auto;"></div>
-            <div class="progress-container"><div class="progress-bar" id="cart-progress"></div></div>
-            <p id="shipping-info" style="font-size: 0.8rem; color: var(--text-dim); margin-bottom: 15px;">Doručenie digitálne (0.00 €)</p>
-            <h3 id="cart-total">SPOLU: 0.00 €</h3>
-            <button class="btn-cta" style="width: 100%; margin-top: 20px;" onclick="window.location.href='platba.html'">PLATBA</button>
-            <p style="cursor: pointer; margin-top: 15px; font-size: 0.8rem;" onclick="closeCart()">Pokračovať v nákupe</p>
-        </div>
+    <div class="grammar-box">
+        <h2>E. Štylistika (Sloh)</h2>
+        <ul>
+            <li><b>Jazykové štýly:</b> 
+                <br>1. <i>Hovorový</i> (bežná reč, slang)
+                <br>2. <i>Administratívny</i> (úradný, presný, bez citov, napr. žiadosť, životopis)
+                <br>3. <i>Náučný</i> (odborný termín, zložité vety, napr. referát, úvaha)
+                <br>4. <i>Publicistický</i> (noviny, upútanie pozornosti, napr. reportáž, fejtón)
+                <br>5. <i>Umelecký</i> (metafory, estetická funkcia, beletria)
+                <br>6. <i>Rečnícky</i> (prihovorenie sa publiku, slávnostný prejav).
+            </li>
+            <li><b>Slohové postupy (AKO sa tvorí text):</b>
+                <br>- <i>Informačný</i> (fakty: kto, čo, kde, kedy).
+                <br>- <i>Opisný</i> (vlastnosti, znaky).
+                <br>- <i>Rozprávačí</i> (príbeh, dej zviazaný v čase).
+                <br>- <i>Výkladový/Úvahový</i> (vysvetlenie príčin a následkov / vlastný názor).
+            </li>
+        </ul>
     </div>
 
-    <div id="profile-modal" class="modal">
-        <div class="modal-content profile-expanded">
-            <div class="profile-sidebar">
-                <div class="sidebar-user">
-                    <img id="sidebar-avatar" src="https://i.pravatar.cc/100?u=9" alt="Avatar">
-                    <h4 id="sidebar-name">Meno Užívateľa</h4>
-                    <p>Premium Member</p>
-                </div>
-                <div class="sidebar-item active" onclick="switchProfileTab('dash', this)">
-                    <span>📊</span> Prehľad Progresu
-                </div>
-                <div class="sidebar-item" onclick="switchProfileTab('plans', this)">
-                    <span>📂</span> Moje Plány
-                </div>
-                <div class="sidebar-item" onclick="switchProfileTab('achieve', this)">
-                    <span>🏆</span> Úspechy
-                </div>
-                <div class="sidebar-item" onclick="switchProfileTab('settings', this)">
-                    <span>⚙️</span> Nastavenia
-                </div>
-                <div class="sidebar-item" onclick="switchProfileTab('advanced', this)">
-                    <span>🚀</span> Pokročilé
-                </div>
-                <button class="btn-cta" style="margin-top: auto; width: 100%; font-size: 0.7rem; background: #222; box-shadow: none;" onclick="closeProfile()">Zavrieť</button>
-            </div>
-            <div class="profile-body">
-                <div id="dash-section" class="profile-section active">
-                    <h2 style="margin-bottom: 5px; color: var(--primary);">TVOJ DASHBOARD</h2>
-                    <p style="color: var(--text-dim); font-size: 0.85rem; margin-bottom: 25px;">Tvoj aktuálny progres a štatistiky.</p>
-                    <div class="stat-grid">
-                        <div class="stat-box"><small>BMI INDEX</small><h3 id="dash-bmi">--</h3></div>
-                        <div class="stat-box"><small>VÁHA (KG)</small><h3 id="dash-weight">-- kg</h3></div>
-                        <div class="stat-box"><small>AKTÍVNE DNI</small><h3>12</h3></div>
-                    </div>
-                    <h3 style="margin-top: 30px; font-size: 1rem; text-transform: uppercase;">Denný cieľ vody</h3>
-                    <div class="progress-container" style="height: 12px;"><div class="progress-bar" style="width: 70%;"></div></div>
-                    <p style="font-size: 0.75rem; color: var(--text-dim);">Vypité: 2.1L / Cieľ: 3.0L</p>
-                </div>
+    <div class="page-break"></div>
 
-                <div id="plans-section" class="profile-section">
-                    <h2 style="margin-bottom: 20px; color: var(--primary);">MOJE PLÁNY</h2>
-                    <div class="plan-item">
-                        <div class="plan-info">
-                            <h4>Objemový Kráľ 2.0</h4>
-                            <span class="plan-status">AKTÍVNY</span>
-                        </div>
-                        <button class="btn-download">STIAHNUŤ</button>
-                    </div>
-                    <div class="plan-item" style="opacity: 0.5;">
-                        <div class="plan-info">
-                            <h4>Jedálniček na mieru</h4>
-                            <span class="plan-status" style="background: orange; color: white;">ČAKÁ NA PLATBU</span>
-                        </div>
-                        <button class="btn-download" disabled>ZAMKNUTÉ</button>
-                    </div>
-                </div>
-
-                <div id="achieve-section" class="profile-section">
-                    <h2 style="margin-bottom: 20px; color: var(--primary);">DOSIAHNUTÉ ÚSPECHY</h2>
-                    <div class="achievements">
-                        <div class="ach-icon unlocked" title="Registrácia">🔥</div>
-                        <div class="ach-icon unlocked" title="Prvé BMI">🧮</div>
-                        <div class="ach-icon" title="Prvý nákup">💰</div>
-                        <div class="ach-icon" title="Cieľová váha">🎯</div>
-                        <div class="ach-icon" title="Disciplína">🦾</div>
-                    </div>
-                </div>
-
-                <div id="settings-section" class="profile-section">
-                    <h2 style="margin-bottom: 20px; color: var(--primary);">NASTAVENIA ÚČTU</h2>
-                    <div class="settings-group">
-                        <h4>Osobné údaje</h4>
-                        <input type="text" id="set-name" placeholder="Meno a priezvisko">
-                        <input type="email" id="set-email" placeholder="Emailová adresa">
-                        <input type="password" id="set-pass" placeholder="Nové heslo (ponechajte prázdne pre zachovanie)">
-                    </div>
-                    <div class="settings-group">
-                        <h4>Zmeniť Avatara</h4>
-                        <div class="avatar-options">
-                            <img src="https://i.pravatar.cc/100?u=1" class="avatar-img" onclick="changeAvatar(this.src, this)">
-                            <img src="https://i.pravatar.cc/100?u=2" class="avatar-img" onclick="changeAvatar(this.src, this)">
-                            <img src="https://i.pravatar.cc/100?u=3" class="avatar-img" onclick="changeAvatar(this.src, this)">
-                            <img src="https://i.pravatar.cc/100?u=4" class="avatar-img" onclick="changeAvatar(this.src, this)">
-                            <img src="https://i.pravatar.cc/100?u=5" class="avatar-img" onclick="changeAvatar(this.src, this)">
-                            <img src="https://i.pravatar.cc/100?u=6" class="avatar-img" onclick="changeAvatar(this.src, this)">
-                        </div>
-                    </div>
-                    <div class="settings-group">
-                        <h4>Preferencie</h4>
-                        <div class="toggle-row"><span>Emailové notifikácie</span><label class="switch"><input type="checkbox" id="pref-email" checked><span class="slider"></span></label></div>
-                        <div class="toggle-row"><span>Tréning v posilňovni</span><label class="switch"><input type="checkbox" id="pref-gym" checked><span class="slider"></span></label></div>
-                        <div class="toggle-row"><span>Tmavý režim (Vždy On)</span><label class="switch"><input type="checkbox" checked disabled><span class="slider"></span></label></div>
-                    </div>
-                    <button class="btn-cta" style="width: 100%;" onclick="saveSettings()">ULOŽIŤ VŠETKY ZMENY</button>
-                    <p id="save-msg" style="color: var(--success); text-align: center; margin-top: 10px; font-size: 0.8rem; display: none;">Zmeny boli úspešne uložené!</p>
-                </div>
-
-                <div id="advanced-section" class="profile-section">
-                    <h2 style="margin-bottom: 20px; color: var(--primary);">POKROČILÉ FUNKCIE</h2>
-                    <div class="settings-group">
-                        <h4>Hardcore Mode</h4>
-                        <div class="toggle-row">
-                            <span>Aktivovať Hardcore vizuál (Červené pulzovanie)</span>
-                            <label class="switch">
-                                <input type="checkbox" id="hc-toggle" onchange="toggleHardcore()">
-                                <span class="slider"></span>
-                            </label>
-                        </div>
-                    </div>
-                    <div class="settings-group">
-                        <h4>Beta Funkcie</h4>
-                        <div class="toggle-row"><span>Bio-Feedback Sync</span><label class="switch"><input type="checkbox" checked><span class="slider"></span></label></div>
-                        <div class="toggle-row"><span>Anonymný režim</span><label class="switch"><input type="checkbox"><span class="slider"></span></label></div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <div id="sales-notification"></div>
+    <h1>3. Časť: Ako a čo z toho čítať? (Tipy pre maturanta)</h1>
+    <p>Z priloženého zoznamu máte na výber množstvo kníh. Na úspešné zvládnutie maturity <b>nemusíte prečítať každú jednu celú</b> (aj keď by to bolo ideálne), ale kľúčové diela by ste mali aspoň detailne poznať z obsahov a čitateľských denníkov. Tieto diela z vašich 30 tém sú "najpopulárnejšie" a určite z nich treba mať jasno:</p>
     
+    <ol>
+        <li><b>Sofokles - Antigona:</b> Krátka dráma, ľahko sa číta, dá sa použiť na antiku aj porovnanie s absurdnou drámou.</li>
+        <li><b>Jozef Gregor Tajovský - Maco Mlieč:</b> Veľmi krátka a dôležitá slovenská poviedka o ľudskej biede.</li>
+        <li><b>J. D. Salinger - Kto chytá v žite:</b> Veľmi čitateľné pre mladých, jazyk tínedžera.</li>
+        <li><b>E. M. Remarque - Na západe nič nové:</b> Skvelá protivojnová kniha, pochopíte "stratenú generáciu".</li>
+        <li><b>Ivan Bukovčan - Kým kohút nezaspieva:</b> Často kladená maturitná hra, napínavý dej (dá sa pozrieť aj ako film/inscenácia).</li>
+        <li><b>Božena Slančíková-Timrava - Ťapákovci:</b> Klasika, ktorú treba vedieť aspoň prerozprávať (Iľa vs. Anča).</li>
+        <li><b>Dobroslav Chrobák - Drak sa vracia:</b> Tenká knižka o naturizme, prečítate za pár hodín.</li>
+    </ol>
+    <p class="important">Tip pre ústnu odpoveď: Ak neviete presný dej knihy, zachráňte to teóriou – hovorte o dobe, v ktorej autor žil, o literárnom smere (napr. znaky realizmu, naturizmu), aké iné diela sa vtedy písali a pod.</p>
 
-    <script>
-        
-        
-        
-        function toggleCookieBtn() {
-            const isChecked = document.getElementById('cookie-check').checked;
-            document.getElementById('cookie-accept-btn').disabled = !isChecked;
-        }
-
-        function acceptCookies() {
-            document.getElementById('cookie-overlay').style.display = 'none';
-            document.getElementById('auth-screen').style.display = 'flex';
-        }
-
-        function login() {
-            document.getElementById('auth-screen').style.display = 'none';
-            document.getElementById('main-web-content').style.display = 'block';
-        }
-
-        function toggleProfile() {
-            const prof = document.getElementById('profile-section');
-            const hero = document.getElementById('hero');
-            const bmi = document.getElementById('bmi');
-
-            if(prof.style.display === 'none') {
-                prof.style.display = 'block';
-                hero.style.display = 'none';
-                bmi.style.display = 'none';
-            } else {
-                prof.style.display = 'none';
-                hero.style.display = 'flex';
-                bmi.style.display = 'block';
-            }
-        }
-        function openStoryModal() {
-    document.getElementById('story-modal').style.display = 'flex';
-}
-
-function closeStoryModal() {
-    document.getElementById('story-modal').style.display = 'none';
-}
-
-// Nezabudni doplniť story-modal aj do tvojho window.onclick detektora, ak ho používaš:
-// if (event.target == storyModal) storyModal.style.display = "none";
-        function openHelpModal() {
-    document.getElementById('help-modal').style.display = 'flex';
-}
-
-function closeHelpModal() {
-    document.getElementById('help-modal').style.display = 'none';
-}
-
-// Voliteľné: Zavretie okna po kliknutí mimo obsahu (podobne ako pri ostatných)
-window.onclick = function(event) {
-    const helpModal = document.getElementById('help-modal');
-    const orderModal = document.getElementById('order-modal');
-    const cartModal = document.getElementById('cart-modal');
-    const profileModal = document.getElementById('profile-modal');
-    
-    if (event.target == helpModal) helpModal.style.display = "none";
-    if (event.target == orderModal) orderModal.style.display = "none";
-    if (event.target == cartModal) cartModal.style.display = "none";
-    if (event.target == profileModal) profileModal.style.display = "none";
-}
-        function openOrderModal() {
-    const orderContent = document.getElementById('order-status-content');
-    
-    if (!loggedUser) {
-        orderContent.innerHTML = `<p style="text-align:center;">Pre zobrazenie objednávok sa musíte najskôr prihlásiť.</p>`;
-    } else {
-        // Simulujeme údaje o objednávke z profilu a aktuálneho košíka
-        const orderNumber = Math.floor(100000 + Math.random() * 900000); // Náhodné číslo objednávky
-        
-        let productsHtml = cart.length > 0 
-            ? cart.map(item => `<li>${item.name} (${item.price.toFixed(2)} €)</li>`).join('')
-            : "<li>Žiadne aktívne produkty v košíku</li>";
-
-        orderContent.innerHTML = `
-            <div style="background: #1a1a1a; padding: 15px; border-radius: 10px; border-left: 4px solid var(--primary); margin-bottom: 20px;">
-                <p style="font-size: 0.8rem; color: var(--primary); font-weight: 900;">STAV: PRIPRAVUJE SA</p>
-                <p style="font-size: 0.9rem;">Číslo objednávky: <b>#${orderNumber}</b></p>
-            </div>
-            
-            <div style="margin-bottom: 15px;">
-                <h4 style="font-size: 0.8rem; text-transform: uppercase; color: var(--text-dim);">Doručovacie údaje:</h4>
-                <p style="font-size: 0.9rem;"><b>Meno:</b> ${loggedUser.name}</p>
-                <p style="font-size: 0.9rem;"><b>Email:</b> ${loggedUser.email}</p>
-                <p style="font-size: 0.9rem;"><b>Telefón:</b> +421 9xx xxx xxx</p>
-            </div>
-
-            <div>
-                <h4 style="font-size: 0.8rem; text-transform: uppercase; color: var(--text-dim);">Objednaný tovar:</h4>
-                <ul style="font-size: 0.85rem; padding-left: 20px; margin-top: 5px; color: #ccc;">
-                    ${productsHtml}
-                </ul>
-            </div>
-        `;
-    }
-    document.getElementById('order-modal').style.display = 'flex';
-}
-
-function closeOrderModal() {
-    document.getElementById('order-modal').style.display = 'none';
-}
-        // GLOBAL VARIABLES
-        let authMode = 'login';
-        let loggedUser = JSON.parse(localStorage.getItem('loggedUser'));
-        let cart = JSON.parse(localStorage.getItem('fitCart')) || [];
-
-        // SEARCH DATABASE (Doplnil som názvy a linky, ktoré máš v menu)
-        const searchData = [
-            { name: "Srvátkový Koncentrát", url: "srvatkovy-koncentrat.html" },
-            { name: "Srvátkový Izolát", url: "srvatkovy-izolat.html" },
-            { name: "Vegánsky Proteín", url: "vegansky-protein.html" },
-            { name: "Nočný Kazeín", url: "nocny-kazein.html" },
-            { name: "Kreatín Monohydrát", url: "kreatin-monohydrat.html" },
-            { name: "Kreatín HCl", url: "kreatin-hc1.html" },
-            { name: "Kre-Alkalyn", url: "kre-alkalyn.html" },
-            { name: "Viaczložkové kreatíny", url: "viaczlozkove-kreatiny.html" },
-            { name: "So stimulantmi (Kofeín)", url: "stimulanty.html" },
-            { name: "Bez stimulantov (Pumpa)", url: "pumpa.html" },
-            { name: "Tekuté (Shot)", url: "shopy.html" },
-            { name: "Focus & Energia", url: "focus.html" },
-            { name: "Multivitamíny", url: "multivitaminy.html" },
-            { name: "Kĺbová výživa", url: "klbova-vyziva.html" },
-            { name: "Magnézium a Zinok", url: "magnezium-zinok.html" },
-            { name: "Omega 3", url: "omega-3.html" },
-            { name: "Podpora imunity", url: "imunita.html" },
-            { name: "Trhačky a Opasky", url: "trhacky-opasky.html" },
-            { name: "Šejkre a Fľaše", url: "sejkre-flase.html" },
-            { name: "Rukavice na cvičenie", url: "rukavice.html" },
-            { name: "Odporové gumy", url: "odporove-gumy.html" }
-        ];
-
-        function filterSearch() {
-            const input = document.getElementById('site-search').value.toLowerCase();
-            const resultsBox = document.getElementById('search-results');
-            resultsBox.innerHTML = '';
-            
-            if(input.length < 1) {
-                resultsBox.style.display = 'none';
-                return;
-            }
-
-            const filtered = searchData.filter(item => item.name.toLowerCase().includes(input));
-
-            if(filtered.length > 0) {
-                resultsBox.style.display = 'flex';
-                filtered.forEach(item => {
-                    const a = document.createElement('a');
-                    a.href = item.url;
-                    a.innerText = item.name;
-                    resultsBox.appendChild(a);
-                });
-            } else {
-                resultsBox.style.display = 'none';
-            }
-        }
-
-        // Zavrieť vyhľadávanie pri kliknutí mimo
-        document.addEventListener('click', (e) => {
-            if(!e.target.closest('.search-container')) {
-                document.getElementById('search-results').style.display = 'none';
-            }
-        });
-
-        // ON LOAD
-        window.onload = function() {
-            if (loggedUser) {
-                showMainContent();
-            } else {
-                document.getElementById('auth-screen').style.display = 'flex';
-            }
-            updateCartUI();
-        };
-
-        // AUTH LOGIC
-        function switchAuth(mode) {
-            authMode = mode;
-            document.getElementById('tab-login').classList.toggle('active', mode === 'login');
-            document.getElementById('tab-reg').classList.toggle('active', mode === 'reg');
-            document.getElementById('auth-title').innerText = mode === 'login' ? 'Vitaj späť!' : 'Registrácia';
-            document.getElementById('reg-extra').style.display = mode === 'reg' ? 'block' : 'none';
-        }
-
-        function handleAuth() {
-            const email = document.getElementById('email').value;
-            const password = document.getElementById('password').value;
-            const username = document.getElementById('username').value;
-
-            if (authMode === 'reg') {
-                const user = { 
-                    email, password, name: username || 'Užívateľ', bmi: '--', weight: '--', 
-                    avatar: 'https://i.pravatar.cc/100?u=9', prefEmail: true, prefGym: true 
-                };
-                localStorage.setItem('user_' + email, JSON.stringify(user));
-                loggedUser = user;
-                localStorage.setItem('loggedUser', JSON.stringify(loggedUser));
-                document.getElementById('auth-screen').style.display = 'none';
-                document.getElementById('onboarding-screen').style.display = 'flex';
-            } else {
-                const saved = JSON.parse(localStorage.getItem('user_' + email));
-                if (saved && saved.password === password) {
-                    loggedUser = saved;
-                    localStorage.setItem('loggedUser', JSON.stringify(loggedUser));
-                    showMainContent();
-                } else { alert("Nesprávne údaje!"); }
-            }
-        }
-
-        function finishOnboarding() {
-            document.getElementById('onboarding-screen').style.display = 'none';
-            showMainContent();
-        }
-
-        function showMainContent() {
-            document.getElementById('auth-screen').style.display = 'none';
-            document.getElementById('main-web-content').style.display = 'block';
-            
-            document.getElementById('sidebar-name').innerText = loggedUser.name;
-            document.getElementById('dash-bmi').innerText = loggedUser.bmi;
-            document.getElementById('dash-weight').innerText = (loggedUser.weight || '--') + " kg";
-            
-            document.getElementById('set-name').value = loggedUser.name;
-            document.getElementById('set-email').value = loggedUser.email;
-            document.getElementById('pref-email').checked = loggedUser.prefEmail;
-            document.getElementById('pref-gym').checked = loggedUser.prefGym;
-
-            if(loggedUser.avatar) changeAvatar(loggedUser.avatar);
-        }
-
-        function saveSettings() {
-            loggedUser.name = document.getElementById('set-name').value;
-            loggedUser.email = document.getElementById('set-email').value;
-            if(document.getElementById('set-pass').value !== "") {
-                loggedUser.password = document.getElementById('set-pass').value;
-            }
-            loggedUser.prefEmail = document.getElementById('pref-email').checked;
-            loggedUser.prefGym = document.getElementById('pref-gym').checked;
-
-            localStorage.setItem('loggedUser', JSON.stringify(loggedUser));
-            localStorage.setItem('user_' + loggedUser.email, JSON.stringify(loggedUser));
-            
-            document.getElementById('sidebar-name').innerText = loggedUser.name;
-            const msg = document.getElementById('save-msg');
-            msg.style.display = 'block';
-            setTimeout(() => msg.style.display = 'none', 3000);
-        }
-
-        function logout() {
-            localStorage.removeItem('loggedUser');
-            location.reload();
-        }
-
-        
-        
-
-        function addToCart(name, price, event) {
-            if(event) event.preventDefault();
-            cart.push({name, price});
-            localStorage.setItem('fitCart', JSON.stringify(cart));
-            updateCartUI();
-            
-            const btn = document.getElementById('cart-nav-btn');
-            if(btn) {
-                btn.classList.add('cart-shake');
-                setTimeout(() => btn.classList.remove('cart-shake'), 400);
-            }
-        }
-
-        function removeFromCart(index) {
-            cart.splice(index, 1);
-            localStorage.setItem('fitCart', JSON.stringify(cart));
-            updateCartUI();
-        }
-
-        function updateCartUI() {
-            const countEl = document.getElementById('cart-count');
-            if(countEl) countEl.innerText = cart.length;
-
-            const list = document.getElementById('cart-items');
-            if(!list) return;
-
-            list.innerHTML = '';
-            let total = 0;
-            cart.forEach((item, idx) => {
-                total += item.price;
-                list.innerHTML += `
-                <div class="cart-item">
-                    <span>${item.name}</span>
-                    <div style="display:flex; gap:10px; align-items:center;">
-                        <span style="color:var(--primary); font-weight:700;">${item.price.toFixed(2)} €</span>
-                        <button class="remove-btn" onclick="removeFromCart(${idx})">×</button>
-                    </div>
-                </div>`;
-            });
-            document.getElementById('cart-total').innerText = `SPOLU: ${total.toFixed(2)} €`;
-            document.getElementById('cart-progress').style.width = Math.min(total*2, 100) + '%';
-        }
-
-        function openCart() { document.getElementById('cart-modal').style.display = 'flex'; }
-        function closeCart() { document.getElementById('cart-modal').style.display = 'none'; }
-        function openProfile() { document.getElementById('profile-modal').style.display = 'flex'; }
-        function closeProfile() { document.getElementById('profile-modal').style.display = 'none'; }
-
-        function switchProfileTab(tab, el) {
-            document.querySelectorAll('.sidebar-item').forEach(i => i.classList.remove('active'));
-            document.querySelectorAll('.profile-section').forEach(s => s.classList.remove('active'));
-            el.classList.add('active');
-            document.getElementById(tab + '-section').classList.add('active');
-        }
-
-        function changeAvatar(src, el) {
-            document.getElementById('sidebar-avatar').src = src;
-            document.getElementById('user-profile-btn').innerHTML = `<img src="${src}" style="width:100%; height:100%; border-radius:50%;">`;
-            if(el) {
-                document.querySelectorAll('.avatar-img').forEach(img => img.classList.remove('active-avatar'));
-                el.classList.add('active-avatar');
-            }
-            if(loggedUser) {
-                loggedUser.avatar = src;
-                localStorage.setItem('loggedUser', JSON.stringify(loggedUser));
-            }
-        }
-
-        function toggleHardcore() {
-            const isEnabled = document.getElementById('hc-toggle').checked;
-            document.getElementById('main-body').classList.toggle('hardcore-mode', isEnabled);
-        }
-
-        function toggleFaq(el) { el.classList.toggle('active'); }
-        function closeNews() { document.getElementById('news-popup').style.display = 'none'; }
-        function submitNewsletter() { alert('Prihlásené!'); closeNews(); }
-
-        const names = ["Marek", "Jana", "Lukáš", "Michal", "Ema"];
-        setInterval(() => {
-            if(Math.random() > 0.8) {
-                const notif = document.getElementById('sales-notification');
-                if(!notif) return;
-                notif.innerHTML = `<div style="display:flex; gap:10px; align-items:center;">
-                    <img src="https://i.pravatar.cc/100?u=${Math.floor(Math.random()*50)}" style="width:40px;height:40px;border-radius:50%">
-                    <div><b>${names[Math.floor(Math.random()*names.length)]}</b> práve kúpil plán!</div>
-                </div>`;
-                notif.classList.add('show');
-                setTimeout(() => notif.classList.remove('show'), 4000);
-            }
-        }, 8000);
-
-        let time = 3600;
-        setInterval(() => {
-            time--;
-            let h = Math.floor(time / 3600);
-            let m = Math.floor((time % 3600) / 60);
-            let s = time % 60;
-            const timerEl = document.getElementById('countdown');
-            if(timerEl) timerEl.innerText = `${h < 10 ? '0'+h:h}:${m < 10 ? '0'+m:m}:${s < 10 ? '0'+s:s}`;
-        }, 1000);
-        let selectedSex = 'M';
-
-function setSex(s) {
-    selectedSex = s;
-    document.getElementById('sex-m').classList.toggle('active', s === 'M');
-    document.getElementById('sex-f').classList.toggle('active', s === 'F');
-}
-function calculateAll() {
-    const h = parseFloat(document.getElementById('height').value) / 100;
-    const w = parseFloat(document.getElementById('weight').value);
-    
-    if (!h || !w) return;
-
-    // BMI a Status
-    const bmi = (w / (h * h)).toFixed(1);
-    document.getElementById('bmi-val').innerText = bmi;
-    
-    let status = "Normálna";
-    let pos = 35;
-    if(bmi < 18.5) { status = "Podváha"; pos = 10; }
-    else if(bmi >= 25 && bmi < 30) { status = "Nadváha"; pos = 60; }
-    else if(bmi >= 30) { status = "Obezita"; pos = 85; }
-    
-    document.getElementById('bmi-status').innerText = status;
-    document.getElementById('bmi-pointer').style.left = pos + "%";
-
-    // BMR
-    document.getElementById('bmr-val').innerText = Math.round((10 * w) + (6.25 * h * 100) - (5 * 25) + 5) + " kcal";
-
-    // Ideálna váha
-    document.getElementById('ideal-weight').innerText = Math.round(22 * (h * h)) + " kg";
-
-    // Voda
-    document.getElementById('water-val').innerText = (w * 0.6).toFixed(1) + " L";
-
-    // Body Fat
-    if (typeof calcMode !== 'undefined' && calcMode === 'fat') {
-        const neck = parseFloat(document.getElementById('neck').value);
-        const waist = parseFloat(document.getElementById('waist').value);
-        if (neck && waist) {
-            const fat = 495 / (1.0324 - 0.19077 * Math.log10(waist - neck) + 0.15456 * Math.log10(h * 100)) - 450;
-            document.getElementById('fat-val').innerText = fat.toFixed(1) + "%";
-        }
-    }
-}
-// Načítanie údajov pri štarte
-document.addEventListener('DOMContentLoaded', () => {
-    const savedData = JSON.parse(localStorage.getItem('userFitnessData'));
-    if (savedData) {
-        if (savedData.h) document.getElementById('height').value = savedData.h;
-        if (savedData.w) document.getElementById('weight').value = savedData.w;
-        if (savedData.n) document.getElementById('neck').value = savedData.n;
-        if (savedData.wa) document.getElementById('waist').value = savedData.wa;
-        calculateAndSave();
-    }
-});
-
-function calculateAndSave() {
-    const h = parseFloat(document.getElementById('height').value);
-    const w = parseFloat(document.getElementById('weight').value);
-    const n = parseFloat(document.getElementById('neck').value) || 0;
-    const wa = parseFloat(document.getElementById('waist').value) || 0;
-
-    if (!h || !w) return;
-
-    // 1. BMI VÝPOČET
-    const heightM = h / 100;
-    const bmi = (w / (heightM * heightM)).toFixed(1);
-    document.getElementById('bmi-val').innerText = bmi;
-
-    // 2. STAV A STUPNICA
-    let status = "Normálna váha";
-    let risk = "Minimálne";
-    let pos = 35;
-    if (bmi < 18.5) { status = "Podváha"; risk = "Zvýšené"; pos = 10; }
-    else if (bmi >= 25 && bmi < 30) { status = "Nadváha"; risk = "Zvýšené"; pos = 60; }
-    else if (bmi >= 30) { status = "Obezita"; risk = "Vysoké"; pos = 85; }
-    
-    document.getElementById('bmi-status').innerText = status;
-    document.getElementById('risk-level').innerText = risk;
-    document.getElementById('bmi-pointer').style.left = pos + "%";
-
-    // 3. OSTATNÉ ANALÝZY
-    document.getElementById('bmr-val').innerText = Math.round(10 * w + 6.25 * h - 5 * 25 + 5);
-    document.getElementById('ideal-weight').innerText = Math.round(22 * (heightM * heightM));
-    document.getElementById('water-val').innerText = (w * 0.6).toFixed(1);
-    document.getElementById('bsa-val').innerText = Math.sqrt((h * w) / 3600).toFixed(2);
-
-    // 4. BODY FAT (ak je zadaný krk a pás)
-    if (n && wa) {
-        const fat = 495 / (1.0324 - 0.19077 * Math.log10(wa - n) + 0.15456 * Math.log10(h)) - 450;
-        document.getElementById('fat-val').innerText = Math.max(0, fat).toFixed(1) + "%";
-    }
-
-    // 5. UKLADANIE DO LOCALSTORAGE
-    const dataToSave = { h, w, n, wa, bmi, status };
-    localStorage.setItem('userFitnessData', JSON.stringify(dataToSave));
-
-    // 6. VIZUÁLNA SPÄTNÁ VÄZBA (Status bar)
-    const sStatus = document.getElementById('save-status');
-    sStatus.style.opacity = "1";
-    
-    // 7. AKTUALIZÁCIA V PROFILE (ak máš v kóde ID 'profile-weight' atď)
-    const profW = document.getElementById('user-weight-display'); // uprav ID podľa tvojho profilu
-    if(profW) profW.innerText = w + " kg";
-}
-function toggleTheme() {
-    const body = document.body;
-    const icon = document.getElementById('theme-icon');
-    
-    // Prepnutie triedy na body
-    body.classList.toggle('light-mode');
-    
-    // Kontrola a zmena ikony + uloženie do pamäte
-    if (body.classList.contains('light-mode')) {
-        icon.innerText = '☀️';
-        localStorage.setItem('theme', 'light');
-    } else {
-        icon.innerText = '🌙';
-        localStorage.setItem('theme', 'dark');
-    }
-}
-
-// Funkcia, ktorá sa spustí hneď pri načítaní stránky
-window.addEventListener('DOMContentLoaded', () => {
-    const savedTheme = localStorage.getItem('theme');
-    if (savedTheme === 'light') {
-        document.body.classList.add('light-mode');
-        const icon = document.getElementById('theme-icon');
-        if(icon) icon.innerText = '☀️';
-    }
-});
-
-</script>
-    </script>
-    
-    <div id="order-modal" class="modal">
-    <div class="modal-content">
-        <h2 style="color: var(--primary);">SLEDOVANIE OBJEDNÁVKY</h2>
-        <div id="order-status-content" style="text-align: left; margin-top: 20px;">
-            </div>
-        <button class="btn-cta" style="width: 100%; margin-top: 20px;" onclick="closeOrderModal()">ZAVRIEŤ</button>
-    </div>
-</div>
-<div id="help-modal" class="modal">
-    <div class="modal-content" style="max-width: 500px; text-align: left;">
-        <h2 style="color: var(--primary); text-align: center;">CENTRUM POMOCI</h2>
-        <p style="text-align: center; color: var(--text-dim); font-size: 0.85rem; margin-bottom: 20px;">Ako ti môžeme dnes pomôcť?</p>
-        
-        <div style="display: grid; gap: 15px;">
-            <div style="background: #1a1a1a; padding: 15px; border-radius: 12px; cursor: pointer; border: 1px solid #222;" onclick="alert('Formulár pre reklamácie bol odoslaný na váš email.')">
-                <h4 style="color: white; font-size: 0.9rem;">📦 Reklamácie a vrátenie tovaru</h4>
-                <p style="font-size: 0.75rem; color: var(--text-dim);">Chcem vrátiť plán alebo nahlásiť problém s platbou.</p>
-            </div>
-
-            <div style="background: #1a1a1a; padding: 15px; border-radius: 12px; cursor: pointer; border: 1px solid #222;" onclick="alert('Náš technik je momentálne offline. Napíšte nám na support@fitprogress.sk')">
-                <h4 style="color: white; font-size: 0.9rem;">⚙️ Technická podpora</h4>
-                <p style="font-size: 0.75rem; color: var(--text-dim);">Mám problém s otvorením PDF plánu alebo s prihlásením.</p>
-            </div>
-
-            <div style="background: #1a1a1a; padding: 15px; border-radius: 12px; cursor: pointer; border: 1px solid #222;" onclick="location.href='mailto:coach@fitprogress.sk'">
-                <h4 style="color: white; font-size: 0.9rem;">💪 Konzultácia s trénerom</h4>
-                <p style="font-size: 0.75rem; color: var(--text-dim);">Potrebujem poradiť s výberom správneho plánu pre moje ciele.</p>
-            </div>
-        </div>
-
-        <div style="margin-top: 20px; padding: 15px; background: rgba(255, 77, 0, 0.1); border-radius: 10px; text-align: center;">
-            <p style="font-size: 0.8rem; color: var(--primary); font-weight: 700;">Nenašli ste odpoveď?</p>
-            <p style="font-size: 0.85rem;">Sme tu pre vás 24/7 na <b>podpora@fitprogress.sk</b></p>
-        </div>
-
-        <button class="btn-cta" style="width: 100%; margin-top: 20px; background: #222; box-shadow: none;" onclick="closeHelpModal()">ZAVRIEŤ</button>
-    </div>
-</div>
-<div id="story-modal" class="modal">
-    <div class="modal-content" style="max-width: 600px; text-align: left; max-height: 80vh; overflow-y: auto;">
-        <h2 style="color: var(--primary); text-align: center; margin-bottom: 10px;">NÁŠ PRÍBEH</h2>
-        <p style="text-align: center; font-style: italic; color: var(--text-dim); margin-bottom: 25px;">"Od jedného činka v garáži až po komunitu tisícov ľudí."</p>
-        
-        <div class="story-timeline">
-            <div style="margin-bottom: 20px; border-left: 2px solid var(--primary); padding-left: 15px;">
-                <h4 style="color: var(--primary);">2020: Začiatok</h4>
-                <p style="font-size: 0.85rem;">FitProgress vznikol počas lockdownu ako jednoduchý blog pre kamošov, ktorí chceli cvičiť doma s vlastnou váhou.</p>
-            </div>
-
-            <div style="margin-bottom: 20px; border-left: 2px solid var(--primary); padding-left: 15px;">
-                <h4 style="color: var(--primary);">2022: Personalizácia</h4>
-                <p style="font-size: 0.85rem;">Uvedomili sme si, že "one size fits all" nefunguje. Vyvinuli sme náš prvý algoritmus na výpočet kalórií a mieru tréningov.</p>
-            </div>
-
-            <div style="margin-bottom: 20px; border-left: 2px solid var(--primary); padding-left: 15px;">
-                <h4 style="color: var(--primary);">Dnes: Vaša Premena</h4>
-                <p style="font-size: 0.85rem;">Dnes sme hrdí na viac ako 5 000 úspešných premien a neustále pracujeme na tom, aby sme vám prinášali to najlepšie zo sveta fitness.</p>
-            </div>
-        </div>
-
-        <div style="background: var(--card-bg); padding: 15px; border-radius: 10px; margin-top: 10px;">
-            <p style="font-size: 0.9rem; line-height: 1.5;">
-                Naším cieľom nie je len predávať plány. Naším cieľom je naučiť vás, ako žiť zdravo bez extrémnych diét a zbytočného trápenia. <b>Vaša cesta je našou prioritou.</b>
-            </p>
-        </div>
-
-        <button class="btn-cta" style="width: 100%; margin-top: 25px;" onclick="closeStoryModal()">POKRAČOVAŤ V CESTE</button>
-    </div>
-</div>
-
-
-<<div id="ai-assistant" style="position: fixed; bottom: 30px; right: 30px; z-index: 1000; font-family: 'Inter', sans-serif;">
-    <button onclick="toggleChat()" style="background: var(--primary); color: white; border: none; border-radius: 50%; width: 70px; height: 70px; cursor: pointer; box-shadow: 0 8px 25px var(--primary-glow); font-size: 2rem; transition: transform 0.2s;">
-        🤖
-    </button>
-
-    <div id="chat-window" style="display: none; position: absolute; bottom: 90px; right: 0; width: 400px; height: 550px; background: var(--card-bg); border: 2px solid var(--primary); border-radius: 20px; overflow: hidden; box-shadow: 0 15px 50px rgba(0,0,0,0.9); flex-direction: column;">
-        
-        <div style="background: var(--primary); padding: 18px; font-weight: 900; text-align: center; color: white; font-size: 1.1rem; letter-spacing: 1px;">
-            FITPROGRESS AI COACH
-        </div>
-
-        <div id="chat-content" style="flex: 1; padding: 20px; overflow-y: auto; font-size: 1rem; color: var(--text); display: flex; flex-direction: column; gap: 15px; background: #080808;">
-            <div style="background: #222; padding: 12px 16px; border-radius: 15px 15px 15px 0px; align-self: flex-start; max-width: 85%; line-height: 1.5;">
-                Ahoj! Som tvoj vylepšený AI asistent. Pýtaj sa na čokoľvek ohľadom tréningu, vidím teraz všetko jasne! 🦾
-            </div>
-        </div>
-
-        <div style="padding: 15px; border-top: 1px solid #333; display: flex; background: var(--card-bg); gap: 10px;">
-            <input type="text" id="user-input" placeholder="Napíš svoju otázku..." 
-                style="flex: 1; background: #1a1a1a; border: 1px solid #444; color: white; padding: 12px 15px; border-radius: 10px; outline: none; font-size: 1rem;">
-            <button onclick="sendMessage()" 
-                style="background: var(--primary); border: none; color: white; padding: 10px 20px; border-radius: 10px; cursor: pointer; font-weight: bold; font-size: 1rem;">
-                POSLAŤ
-            </button>
-        </div>
-    </div>
-</div>
-
-<script>
-    let workoutTime = 0;
-let timerActive = false;
-
-function toggleTracker() {
-    const panel = document.getElementById('side-tracker');
-    panel.classList.toggle('active');
-    if(panel.classList.contains('active') && !timerActive) startTimer();
-}
-
-function startTimer() {
-    timerActive = true;
-    setInterval(() => {
-        workoutTime++;
-        let m = Math.floor(workoutTime / 60);
-        let s = workoutTime % 60;
-        document.getElementById('session-time').innerText = `${m}:${s < 10 ? '0' : ''}${s}`;
-    }, 1000);
-}
-
-function addExerciseCard(name) {
-    const body = document.getElementById('log-body');
-    const cardId = Date.now();
-    const card = document.createElement('div');
-    card.className = 'exercise-card';
-    card.id = `ex-${cardId}`;
-    
-    card.innerHTML = `
-        <div style="display:flex; justify-content:space-between; align-items:center;">
-            <h4 style="margin:0; font-size:1rem; color:var(--primary);">${name}</h4>
-            <button onclick="document.getElementById('ex-${cardId}').remove(); calculateStats();" style="background:none; border:none; color:#444; cursor:pointer;">✕</button>
-        </div>
-        <div class="set-labels" style="display:grid; grid-template-columns: 30px 1fr 60px 60px 60px 30px; gap:10px; margin-top:15px; font-size:0.6rem; color:#555; text-align:center;">
-            <div>TYP</div><div>CVIK</div><div>KG</div><div>OPAK.</div><div>%</div><div></div>
-        </div>
-        <div id="sets-container-${cardId}"></div>
-        <button class="add-set-btn" onclick="addSetRow('${cardId}', '${name}')">+ PRIDAŤ SÉRIU</button>
-    `;
-    body.appendChild(card);
-    addSetRow(cardId, name);
-}
-
-function addSetRow(cardId, name) {
-    const container = document.getElementById(`sets-container-${cardId}`);
-    const setNum = container.children.length + 1;
-    const row = document.createElement('div');
-    row.className = 'set-row';
-    row.innerHTML = `
-        <div class="set-type" onclick="toggleSetType(this)">N</div>
-        <div style="font-size:0.7rem; color:#888;">Séria ${setNum}</div>
-        <input type="number" class="set-input kg" placeholder="0" oninput="calculateStats()">
-        <input type="number" class="set-input reps" placeholder="0" oninput="calculateStats()">
-        <div style="font-size:0.7rem; color:var(--success);">100%</div>
-        <button onclick="this.parentElement.remove(); calculateStats();" style="background:none; border:none; color:#333; cursor:pointer;">✕</button>
-    `;
-    container.appendChild(row);
-    calculateStats();
-}
-
-function toggleSetType(el) {
-    if(el.innerText === 'N') { el.innerText = 'W'; el.className = 'set-type warmup'; }
-    else if(el.innerText === 'W') { el.innerText = 'D'; el.className = 'set-type dropset'; }
-    else { el.innerText = 'N'; el.className = 'set-type'; }
-}
-
-function calculateStats() {
-    let volume = 0;
-    let sets = 0;
-    document.querySelectorAll('.set-row').forEach(row => {
-        const kg = parseFloat(row.querySelector('.kg').value) || 0;
-        const reps = parseFloat(row.querySelector('.reps').value) || 0;
-        volume += (kg * reps);
-        sets++;
-    });
-    document.getElementById('total-volume').innerText = volume.toLocaleString();
-    document.getElementById('total-sets').innerText = sets;
-}
-
-function finishWorkout() {
-    const volume = document.getElementById('total-volume').innerText;
-    alert(`Tréning dokončený! \nCelkový objem: ${volume} kg. \nDobrá práca, tvoj progres bol uložený!`);
-    // Tu môžeš pridať ukladanie do localStorage
-    toggleTracker();
-}
-    /* --- LOGIKA PRE BEFORE/AFTER SLIDER --- */
-function slideCompare(slider) {
-    const val = slider.value;
-    // Zmení šírku horného obrázka
-    const container = slider.parentElement;
-    const topImage = container.querySelector('.modified');
-    const line = container.querySelector('.ba-line');
-    const btn = container.querySelector('.ba-button');
-    
-    topImage.style.width = val + "%";
-    
-    // Posunie čiaru a tlačidlo
-    line.style.left = val + "%";
-    btn.style.left = val + "%";
-}
-    // SEM VLOŽ SVOJ KĽÚČ (Musí začínať na AIza...)
-    const GEMINI_API_KEY = "AIzaSyCyDRFrb4FeVRv6DOwRhaDSxn94sCTxjqs"; 
-
-    function toggleChat() {
-        const chat = document.getElementById('chat-window');
-        chat.style.display = (chat.style.display === 'none' || chat.style.display === '') ? 'flex' : 'none';
-    }
-
-    async function sendMessage() {
-    const input = document.getElementById('user-input');
-    const content = document.getElementById('chat-content');
-    const text = input.value.trim();
-
-    if (!text) return;
-
-    // 1. Zobraziť správu používateľa
-    content.innerHTML += '<div class="bubble user-bubble">' + text + '</div>';
-    input.value = "";
-    content.scrollTop = content.scrollHeight;
-
-    // 2. Zobraziť loading
-    const loadingId = "loading-" + Date.now();
-    content.innerHTML += '<div id="' + loadingId + '" class="bubble ai-bubble" style="color: #777;">Rozmýšľam...</div>';
-    content.scrollTop = content.scrollHeight;
-
-    // 3. Volanie API
-    try {
-        // Tu používame verziu v1 a model gemini-1.5-flash
-        const apiUrl = "https://generativelanguage.googleapis.com/v1/models/gemini-1.5-flash:generateContent?key=" + API_KEY;
-        
-        const response = await fetch(apiUrl, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-                contents: [{
-                    parts: [{ text: "Odpovedaj stručne ako fitness tréner v slovenčine: " + text }]
-                }]
-            })
-        });
-
-        const data = await response.json();
-        
-        // Odstrániť loading
-        const loadEl = document.getElementById(loadingId);
-        if(loadEl) loadEl.remove();
-
-        if (data.candidates && data.candidates[0].content) {
-            const reply = data.candidates[0].content.parts[0].text;
-            content.innerHTML += '<div class="bubble ai-bubble">' + reply + '</div>';
-        } else {
-            // Ak Google vráti chybu v JSON formáte
-            console.error("API Error:", data);
-            content.innerHTML += '<div class="bubble ai-bubble" style="color:red;">Chyba: ' + (data.error ? data.error.message : "Neznáma chyba") + '</div>';
-        }
-    } catch (e) {
-        // Ak zlyhá samotné sieťové volanie (napr. blokovanie prehliadačom)
-        console.error("Network Error:", e);
-        const loadEl = document.getElementById(loadingId);
-        if(loadEl) loadEl.innerHTML = "<span style='color:red;'>Chyba pripojenia. Skús iný prehliadač alebo skontroluj internet.</span>";
-    }
-    content.scrollTop = content.scrollHeight;
-}
-/* --- COOKIE LOGIKA (Plne funkčná) --- */
-
-// Pomocná funkcia na nastavenie Cookie (exspirácia v dňoch)
-function setCookie(cname, cvalue, exdays) {
-    const d = new Date();
-    d.setTime(d.getTime() + (exdays * 24 * 60 * 60 * 1000));
-    let expires = "expires=" + d.toUTCString();
-    // Uloží cookie do prehliadača
-    document.cookie = cname + "=" + cvalue + ";" + expires + ";path=/;SameSite=Lax";
-}
-
-// Pomocná funkcia na získanie Cookie podľa mena
-function getCookie(cname) {
-    let name = cname + "=";
-    let decodedCookie = decodeURIComponent(document.cookie);
-    let ca = decodedCookie.split(';');
-    for(let i = 0; i < ca.length; i++) {
-        let c = ca[i];
-        while (c.charAt(0) == ' ') {
-            c = c.substring(1);
-        }
-        if (c.indexOf(name) == 0) {
-            return c.substring(name.length, c.length);
-        }
-    }
-    return "";
-}
-
-// Skontroluje pri načítaní stránky, či už máme súhlas
-function initCookieCheck() {
-    const userConsent = getCookie("fitProgressConsent");
-    
-    // Ak cookie neexistuje, ukáž banner
-    if (userConsent === "") {
-        setTimeout(() => {
-            document.getElementById('cookie-consent-banner').style.display = 'flex';
-        }, 1500); // Malé oneskorenie pre lepší efekt
-    } else {
-        console.log("Cookies už boli prijaté/odmietnuté: " + userConsent);
-    }
-}
-
-// Funkcia volaná tlačidlami v banneri
-function handleCookieConsent(accepted) {
-    const banner = document.getElementById('cookie-consent-banner');
-    
-    if (accepted) {
-        // Užívateľ súhlasil - uložíme na 365 dní
-        setCookie("fitProgressConsent", "accepted", 365);
-        alert("Ďakujeme! Tvoje nastavenia budú odteraz bezpečne uložené. 🦾");
-    } else {
-        // Užívateľ odmietol - uložíme informáciu, že nechce byť sledovaný (na 30 dní)
-        setCookie("fitProgressConsent", "declined", 30);
-    }
-
-    // Animácia zmiznutia
-    banner.style.opacity = "0";
-    banner.style.transform = "translate(-50%, 20px)";
-    setTimeout(() => {
-        banner.style.display = 'none';
-    }, 500);
-}
-
-// Spustiť kontrolu po načítaní stránky
-window.addEventListener('load', initCookieCheck);
-</script>
-    <div id="cookie-consent-banner" class="cookie-overlay">
-    <div class="cookie-content">
-        <h3>🍪 Cookies & Výkon</h3>
-        <p>
-            Aby tvoj progres na <b>FitProgress</b> ostal uložený (košík, prihlásenie, nastavenia), potrebujeme tvoj súhlas s používaním cookies. 
-            Bez nich budeš musieť všetko nastavovať znova pri každej návšteve.
-        </p>
-    </div>
-    <div class="cookie-actions">
-        <button class="btn-cookie-decline" onclick="handleCookieConsent(false)">Len nevyhnutné</button>
-        <button class="btn-cookie-accept" onclick="handleCookieConsent(true)">Súhlasiť a Pokračovať</button>
-    </div>
-</div>
 </body>
 </html>
+"""
+
+# Save to html file
+with open('/tmp/maturita_slovencina.html', 'w', encoding='utf-8') as f:
+    f.write(html_content)
+
+# Convert to PDF
+HTML('/tmp/maturita_slovencina.html').write_pdf('/tmp/Maturita_Slovencina_Materialy.pdf')
+print('[file-tag: Maturita_Slovencina_Materialy.pdf]')
